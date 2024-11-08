@@ -4,6 +4,9 @@ import firebase_admin
 import streamlit as st
 from firebase_admin import credentials, firestore
 
+# to generate private API key:
+# https://console.firebase.google.com/u/0/project/arxiv-website/settings/serviceaccounts/adminsdk
+
 # PermissionDenied: 403 Cloud Firestore API has not been used in project arxiv-website before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=arxiv-website then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [links { description: "Google developers console API activation" url: "https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=arxiv-website" } , reason: "SERVICE_DISABLED" domain: "googleapis.com" metadata { key: "service" value: "firestore.googleapis.com" } metadata { key: "consumer" value: "projects/arxiv-website" } ]
 # https://console.cloud.google.com/apis/api/firestore.googleapis.com/metrics?project=arxiv-website
 # https://console.firebase.google.com/u/0/project/arxiv-website/settings/serviceaccounts/adminsdk
@@ -73,11 +76,13 @@ def main():
     st.header("Select Moderation Category")
     category_id = st.selectbox("Choose your category", [0, 1, 2, 3, 59])  # Modify if there are more categories
     email = st.text_input(label="Please enter your email", value="jcl354@cornell.edu", key='email')
+    # st.session_state["email"] = 
+    
     if st.button("Start Moderation"):
         st.session_state["category_id"] = category_id
         st.session_state["paper_queue"] = load_moderation_queue(category_id)
         st.session_state["current_paper_idx"] = 0
-        st.session_state["email"] = email
+ 
         # st.experimental_rerun()
         st.rerun()
 
@@ -92,12 +97,14 @@ def main():
             paper_info = get_paper_info(paper_id)
 
             if paper_info:
-                st.header(f"Paper ID: {paper_info['id']}")
+                st.header(f"Currently moderating category {category_id} using email {email}")
+
+                st.subheader(f"Paper ID: {paper_info['id']}")
                 st.write(f"[View Paper PDF]({paper_info['url']})")
                 # st.write("Top Categories:", paper_info["top_5_cats"])
 
                 # Moderation Decision
-                st.write("Does this paper belong to your category?")
+                # st.write("Does this paper belong to your category?")
                 # if st.button("Yes"):
                 #     submit_moderation_result(paper_id, category_id, True)
                 #     st.session_state["current_paper_idx"] += 1
@@ -111,17 +118,23 @@ def main():
                 #     st.rerun()
                 decision_p = st.radio(
                     "How well does this paper fit the category as a primary category?",
-                    ["Great fit", "Good fit", "Poor fit", "Reject"],
+                    ["Great fit (category should definitely be primary)", 
+                     "Good fit (category is fine but other categories may be better)", 
+                     "OK fit (category is ok if no other category fits)", 
+                     "Bad fit (category should definitely not be primary)"],
                     key="decision_p"
                 )
 
                 decision_s = st.radio(
-                    "How well does this paper fit the category as a secondary category?",
-                    ["Great fit", "Good fit", "Poor fit", "Reject"],
+                    "If you selected Bad for primary, should the category still be secondary?",
+                    ["Great fit (category should definitely be secondary)", 
+                     "OK fit (I have no objection to listing the category as seocndary)", 
+                     "Bad fit (category should definitely not be secondary)",],
                     key="decision_s"
                 )
                 if st.button("Submit Classification"):
-                    submit_moderation_result(paper_id, category_id, st.session_state["email"], decision_p, decision_s)
+                    submit_moderation_result(paper_id, category_id, email, decision_p, decision_s)
+                    # submit_moderation_result(paper_id, category_id, st.session_state["email"], decision_p, decision_s)
                     st.session_state["current_paper_idx"] += 1
                     st.rerun()
 
