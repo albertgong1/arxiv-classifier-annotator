@@ -14,7 +14,9 @@ from firebase_admin import credentials, firestore
 
 # from https://firebase.google.com/docs/firestore/query-data/get-data#python
 if not firebase_admin._apps:
-    cred = credentials.Certificate('API_KEYS/arxiv-website-firebase-adminsdk-mkdbk-dc872d30e8.json')
+    # cred = credentials.Certificate('API_KEYS/arxiv-website-firebase-adminsdk-mkdbk-dc872d30e8.json')
+    # point to soft link so that we don't have to modify this part of the code
+    cred = credentials.Certificate('./API_KEYS/certificate.json')
     app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
