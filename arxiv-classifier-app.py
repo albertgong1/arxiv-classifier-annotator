@@ -1,6 +1,7 @@
 import json
 
 import firebase_admin
+import pandas as pd
 import streamlit as st
 from firebase_admin import credentials, firestore
 
@@ -73,13 +74,19 @@ def submit_moderation_result(paper_id, category_id, email, decision_p, decision_
 # App UI
 def main():
     st.title("ArXiv Paper Moderator")
+    mod_cats = pd.read_csv("data/mod_cats.csv")
+    mod_emails = pd.read_csv("data/mod_emails.csv")
 
     # Step 1: Select moderation category
     st.header("Select Moderation Category")
-    category_id = st.selectbox("Choose your category", [0, 1, 2, 3, 59])  # Modify if there are more categories
-    email = st.text_input(label="Please enter your email", value="jcl354@cornell.edu", key='email')
-    # st.session_state["email"] = 
-    
+    category_id = st.selectbox("Choose your category", mod_cats["Category"].to_list())  # Modify if there are more categories
+    # category_id = st.selectbox("Choose your category", [0, 1, 2, 3, 59])  # Modify if there are more categories
+    # email = st.text_input(label="Please enter your email", value="jcl354@cornell.edu", key='email')
+    _email = st.selectbox('Select your email or "Other" then input your email below', mod_emails[mod_emails['Category']==category_id]["Email"].tolist()+["Other"], placeholder="jcl354@cornell.edu")
+    if _email == "Other":
+        newEmail = st.text_input("Please enter your email")
+    email = _email if _email != "Other" else newEmail
+
     if st.button("Start Moderation"):
         st.session_state["category_id"] = category_id
         st.session_state["paper_queue"] = load_moderation_queue(category_id)
@@ -139,6 +146,11 @@ def main():
                     # submit_moderation_result(paper_id, category_id, st.session_state["email"], decision_p, decision_s)
                     st.session_state["current_paper_idx"] += 1
                     st.rerun()
+
+                
+                # instead of Tom's #7 i want to do change cateogry and go to prev paper
+                # i think it makes sense to decouple submission and movement
+
 
             else:
                 st.error("Paper information not found.")
