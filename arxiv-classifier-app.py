@@ -76,16 +76,17 @@ def main():
     st.title("ArXiv Paper Moderator")
     mod_cats = pd.read_csv("data/mod_cats.csv")
     mod_emails = pd.read_csv("data/mod_emails.csv")
+    mod_cats["name"] = mod_cats["First name"]+mod_cats["Last name"]
 
     # Step 1: Select moderation category
     st.header("Select Moderation Category")
     category_id = st.selectbox("Choose your category", mod_cats["Category"].to_list())  # Modify if there are more categories
     # category_id = st.selectbox("Choose your category", [0, 1, 2, 3, 59])  # Modify if there are more categories
     # email = st.text_input(label="Please enter your email", value="jcl354@cornell.edu", key='email')
-    _email = st.selectbox('Select your email or "Other" then input your email below', mod_emails[mod_emails['Category']==category_id]["Email"].tolist()+["Other"], placeholder="jcl354@cornell.edu")
-    if _email == "Other":
-        newEmail = st.text_input("Please enter your email")
-    email = _email if _email != "Other" else newEmail
+    _name = st.selectbox('Select your name or "Other" then input your name below', mod_cats[mod_cats['Category']==category_id]["name"].tolist()+["Other"], placeholder="Johann Lee")
+    if _name == "Other":
+        newName = st.text_input("Please enter your name")
+    email = _name if _name != "Other" else newName
 
     if st.button("Start Moderation"):
         st.session_state["category_id"] = category_id
@@ -106,7 +107,7 @@ def main():
             paper_info = get_paper_info(paper_id)
 
             if paper_info:
-                st.header(f"Currently moderating category {category_id} using email {email}")
+                st.header(f"Currently moderating category {category_id} using name {email}")
 
                 st.subheader(f"Paper ID: {paper_info['id']}")
                 st.write(f"[View Paper PDF]({paper_info['url']})")
