@@ -22,13 +22,14 @@ if not firebase_admin._apps:
 db = firestore.client()
 
 # Load data from Firestore collections
-def load_moderation_queue(category_id):
+def load_moderation_queue(mod_name):
     """Retrieve the list of paper IDs for the specified category from the mod_queues collection."""
-    doc_ref = db.collection("mod_queues").document(str(category_id))
+    doc_ref = db.collection("mod_queues").document(str(mod_name))
     doc = doc_ref.get()
     if doc.exists:
-        return doc.to_dict().get(str(category_id), [])
-    return []
+        return doc.to_dict().get('queue', [])
+    else:
+        return []
 
 def get_paper_info(paper_id):
     """Retrieve paper information from the paper_info collection."""
@@ -76,7 +77,7 @@ def main():
     st.title("ArXiv Paper Moderator")
     mod_cats = pd.read_csv("data/mod_cats.csv")
     mod_emails = pd.read_csv("data/mod_emails.csv")
-    mod_cats["name"] = mod_cats["First name"]+mod_cats["Last name"]
+    mod_cats["name"] = mod_cats["First name"] + ' ' + mod_cats["Last name"]
 
     # Step 1: Select moderation category
     st.header("Select Moderation Category")
@@ -86,11 +87,13 @@ def main():
     _name = st.selectbox('Select your name or "Other" then input your name below', mod_cats[mod_cats['Category']==category_id]["name"].tolist()+["Other"], placeholder="Johann Lee")
     if _name == "Other":
         newName = st.text_input("Please enter your name")
+    # TODO: replace `email` variable name with mod_name or mod_id maybe? 
+    # we can use `email` to keep track of the mod's actual email
     email = _name if _name != "Other" else newName
 
     if st.button("Start Moderation"):
         st.session_state["category_id"] = category_id
-        st.session_state["paper_queue"] = load_moderation_queue(category_id)
+        st.session_state["paper_queue"] = load_moderation_queue(email)
         st.session_state["current_paper_idx"] = 0
  
         # st.experimental_rerun()
