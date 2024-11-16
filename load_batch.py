@@ -1,7 +1,9 @@
 # TODO load data into mod_queues and papaer_info automatically
 from argparse import ArgumentParser
 parser = ArgumentParser()
-parser.add_argument("--data_path", type=str, default="data/mod-queue-default-test-pos10-neg10.json")
+parser.add_argument("--data_path", "-dp", type=str, 
+                    default="data/mod-queue-all2023_v2-test-pos10-neg10.json",
+                    help='Path to moderator queues stored as a json file')
 args, _ = parser.parse_known_args()
 
 data_path = args.data_path
@@ -12,6 +14,7 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 # standard imports
 import json
+from tqdm import tqdm
 
 # read data from json file
 with open(data_path, 'r') as f:
@@ -31,7 +34,7 @@ db = firestore.client()
 # Create a write batch
 batch = db.batch()
 
-for name, queue in list(queues.items()):
+for name, queue in tqdm(list(queues.items())):
     # Set the data for the 'users' collection
     doc_ref = db.collection('mod_queues').document(name)
     # any existing data will be overwritten by the new data
@@ -39,3 +42,7 @@ for name, queue in list(queues.items()):
     # to update the data instead of overwriting it, use the update method
 
 batch.commit()
+
+# to check that the data has been loaded correctly into the firestore database
+# go to the following website:
+# https://console.firebase.google.com/project/arxiv-website/firestore/databases/-default-/data/
