@@ -22,10 +22,12 @@ if not firebase_admin._apps:
 db = firestore.client()
 
 # Load data from Firestore collections
-def load_moderation_queue(mod_name):
+def load_moderation_queue(mod_name, current_cat):
     """Retrieve the list of paper IDs for the specified category from the mod_queues collection."""
-    doc_ref = db.collection("mod_queues").document(str(mod_name))
+    # print(str(mod_name)+":"+current_cat.split(":")[0])
+    doc_ref = db.collection("mod_queues").document(str(mod_name)+":"+current_cat.split(":")[0])
     doc = doc_ref.get()
+    # print(doc.to_dict())
     if doc.exists:
         return doc.to_dict().get('queue', [])
     else:
@@ -39,7 +41,7 @@ def get_paper_info(paper_id):
         return doc.to_dict()
     return None
 
-def submit_moderation_result(paper_id, category_id, email, decision_p, decision_s):
+def submit_moderation_result(paper_id, current_cat, mod_name, decision_p, decision_s):
     """Submit moderation result to the mod_results collection."""
     # mod_result_ref = db.collection("mod_results").document(paper_id)
     # mod_result_ref.set({
@@ -50,58 +52,59 @@ def submit_moderation_result(paper_id, category_id, email, decision_p, decision_
     # }, merge=False)
 
     # add result
-    mod_results_ref = db.collection("mod_results")
-    mod_results_ref.add({
+    mod_results_ref = db.collection("mod_results").document(document_id=mod_name+"_"+current_cat.split(":")[0]+"_"+paper_id)
+    mod_results_ref.set({
+        "name": mod_name,
+        "category": str(current_cat),
         "paper_id": paper_id,
-        "my_cat": str(category_id),
-        "email": email,
-        "my_cat_primary": decision_p,
-        "my_cat_secondary": decision_s,
+        "primary_decision": decision_p,
+        "secondary_decision": decision_s,
     })
 
     # remove paper from queue
-    mod_queue_ref = db.collection("mod_queues").document(str(category_id))
+    ref = str(mod_name)+":"+current_cat.split(":")[0]
+    mod_queue_ref = db.collection("mod_queues").document(ref)
     mod_queue_doc = mod_queue_ref.get()
-    
+    # print(mod_queue_doc.to_dict())
+
     if mod_queue_doc.exists:
         queue_data = mod_queue_doc.to_dict()
-        papers = queue_data.get(str(category_id), [])
+        papers = queue_data.get("queue", [])
+        # print(papers)
+        # print(paper_id)
         
         # Remove the paper_id if it's in the queue
         if paper_id in papers:
             papers.remove(paper_id)
-            mod_queue_ref.update({str(category_id): papers})
+            # print(papers)
+            mod_queue_ref.update({"queue": papers})
 
 # App UI
 def main():
     st.title("ArXiv Paper Moderator")
     mod_cats = pd.read_csv("data/mod_cats.csv")
-    mod_emails = pd.read_csv("data/mod_emails.csv")
+    # mod_emails = pd.read_csv("data/mod_emails.csv")
     mod_cats["name"] = mod_cats["First name"] + ' ' + mod_cats["Last name"]
 
     # Step 1: Select moderation category
     st.header("Select Moderation Category")
-    category_id = st.selectbox("Choose your category", mod_cats["Category"].to_list())  # Modify if there are more categories
-    # category_id = st.selectbox("Choose your category", [0, 1, 2, 3, 59])  # Modify if there are more categories
-    # email = st.text_input(label="Please enter your email", value="jcl354@cornell.edu", key='email')
-    _name = st.selectbox('Select your name or "Other" then input your name below', mod_cats[mod_cats['Category']==category_id]["name"].tolist()+["Other"], placeholder="Johann Lee")
+    current_cat = st.selectbox("Choose your category", mod_cats["Category"].to_list())  # Modify if there are more categories
+    _name = st.selectbox('Select your name or "Other" then input your name below', mod_cats[mod_cats['Category']==current_cat]["name"].tolist()+["Other"], placeholder="Johann Lee")
     if _name == "Other":
         newName = st.text_input("Please enter your name")
-    # TODO: replace `email` variable name with mod_name or mod_id maybe? 
-    # we can use `email` to keep track of the mod's actual email
-    email = _name if _name != "Other" else newName
+    mod_name = _name if _name != "Other" else newName
 
     if st.button("Start Moderation"):
-        st.session_state["category_id"] = category_id
-        st.session_state["paper_queue"] = load_moderation_queue(email)
+        st.session_state["current_cat"] = current_cat
+        st.session_state["paper_queue"] = load_moderation_queue(mod_name, current_cat)
         st.session_state["current_paper_idx"] = 0
  
         # st.experimental_rerun()
         st.rerun()
 
     # Step 2: Moderation Page
-    if "category_id" in st.session_state:
-        category_id = st.session_state["category_id"]
+    if "current_cat" in st.session_state:
+        current_cat = st.session_state["current_cat"]
         paper_queue = st.session_state["paper_queue"]
         current_idx = st.session_state["current_paper_idx"]
 
@@ -110,8 +113,6 @@ def main():
             paper_info = get_paper_info(paper_id)
 
             if paper_info:
-                st.header(f"Currently moderating category {category_id} using name {email}")
-
                 st.subheader(f"Paper ID: {paper_info['id']}")
                 st.write(f"[View Paper PDF]({paper_info['url']})")
                 # st.write("Top Categories:", paper_info["top_5_cats"])
@@ -146,12 +147,13 @@ def main():
                     key="decision_s"
                 )
                 if st.button("Submit Classification"):
-                    submit_moderation_result(paper_id, category_id, email, decision_p, decision_s)
+                    submit_moderation_result(paper_id, current_cat, mod_name, decision_p, decision_s)
                     # submit_moderation_result(paper_id, category_id, st.session_state["email"], decision_p, decision_s)
                     st.session_state["current_paper_idx"] += 1
                     st.rerun()
 
-                
+                st.write(f"Currently moderating **{current_cat}** under **{mod_name}**")
+
                 # instead of Tom's #7 i want to do change cateogry and go to prev paper
                 # i think it makes sense to decouple submission and movement
 
