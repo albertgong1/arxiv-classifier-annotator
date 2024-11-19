@@ -4,6 +4,8 @@ import firebase_admin
 import pandas as pd
 import streamlit as st
 from firebase_admin import credentials, firestore
+import requests
+from bs4 import BeautifulSoup
 
 # to generate private API key:
 # https://console.firebase.google.com/u/0/project/arxiv-website/settings/serviceaccounts/adminsdk
@@ -40,6 +42,39 @@ def get_paper_info(paper_id):
     if doc.exists:
         return doc.to_dict()
     return None
+
+def get_arxiv_details_from_id(paper_id):
+    try:
+        # Construct the URL from the paper ID
+        url = f"https://arxiv.org/abs/{paper_id}"
+        
+        # Send a GET request to fetch the HTML content
+        response = requests.get(url)
+        response.raise_for_status()
+        
+        # Parse the HTML content
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Extract the title
+        title_element = soup.find('h1', {'class': 'title mathjax'})
+        title = title_element.get_text(strip=True).replace("Title:", "") if title_element else "Title not found"
+        
+        # Extract the authors
+        author_elements = soup.find('div', {'class': 'authors'})
+        authors = author_elements.get_text(strip=True).replace("Authors:", "") if author_elements else "Authors not found"
+        
+        # Extract the abstract
+        abstract_block = soup.find('blockquote', {'class': 'abstract mathjax'})
+        abstract = abstract_block.get_text(strip=True).replace("Abstract:", "") if abstract_block else "Abstract not found"
+        
+        # Return results as a dictionary
+        return {
+            "title": title,
+            "authors": authors,
+            "abstract": abstract
+        }
+    except requests.exceptions.RequestException as e:
+        return {"Error": f"An error occurred while fetching the page: {e}"}
 
 def submit_moderation_result(paper_id, current_cat, mod_name, decision_p, decision_s):
     """Submit moderation result to the mod_results collection."""
@@ -111,9 +146,13 @@ def main():
         if current_idx < len(paper_queue):
             paper_id = paper_queue[current_idx]
             paper_info = get_paper_info(paper_id)
+            paper_details = get_arxiv_details_from_id(paper_id)
 
             if paper_info:
                 st.subheader(f"Paper ID: {paper_info['id']}")
+                st.write(f"Title: {paper_details['title']}")
+                st.write(f"Authors: {paper_details['authors']}")
+                st.write(f"Abstract: {paper_details['abstract']}")
                 st.write(f"[View Paper PDF]({paper_info['url']})")
                 # st.write("Top Categories:", paper_info["top_5_cats"])
 
