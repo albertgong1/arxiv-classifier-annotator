@@ -2,10 +2,10 @@ import json
 
 import firebase_admin
 import pandas as pd
-import streamlit as st
-from firebase_admin import credentials, firestore
 import requests
+import streamlit as st
 from bs4 import BeautifulSoup
+from firebase_admin import credentials, firestore
 
 # to generate private API key:
 # https://console.firebase.google.com/u/0/project/arxiv-website/settings/serviceaccounts/adminsdk
@@ -123,7 +123,7 @@ def main():
 
     # Step 1: Select moderation category
     st.header("Select Moderation Category")
-    current_cat = st.selectbox("Choose your category", mod_cats["Category"].to_list())  # Modify if there are more categories
+    current_cat = st.selectbox("Choose your category", set(mod_cats["Category"].to_list()))  # Modify if there are more categories
     _name = st.selectbox('Select your name or "Other" then input your name below', mod_cats[mod_cats['Category']==current_cat]["name"].tolist()+["Other"], placeholder="Johann Lee")
     if _name == "Other":
         newName = st.text_input("Please enter your name")
