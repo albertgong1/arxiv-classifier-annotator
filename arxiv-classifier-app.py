@@ -100,6 +100,7 @@ def submit_moderation_result(paper_id, current_cat, mod_name, decision_p, decisi
     ref = str(mod_name)+":"+current_cat.split(":")[0]
     mod_queue_ref = db.collection("mod_queues").document(ref)
     mod_queue_doc = mod_queue_ref.get()
+
     # print(mod_queue_doc.to_dict())
 
     if mod_queue_doc.exists:
@@ -149,10 +150,10 @@ def main():
             paper_details = get_arxiv_details_from_id(paper_id)
 
             if paper_info:
-                st.subheader(f"Paper ID: {paper_info['id']}")
-                st.write(f"Title: {paper_details['title']}")
-                st.write(f"Authors: {paper_details['authors']}")
-                st.write(f"Abstract: {paper_details['abstract']}")
+                # st.subheader(f"Paper ID: {paper_info['id']}")
+                st.write(f"**Title**: {paper_details['title']}")
+                st.write(f"**Authors**: {paper_details['authors']}")
+                st.write(f"**Abstract**: {paper_details['abstract']}")
                 st.write(f"[View Paper PDF]({paper_info['url']})")
                 # st.write("Top Categories:", paper_info["top_5_cats"])
 
@@ -170,7 +171,7 @@ def main():
                 #     # st.experimental_rerun()
                 #     st.rerun()
                 decision_p = st.radio(
-                    "How well does this paper fit the category as a primary category?",
+                    f"How well does {current_cat} fit this paper as the primary category?",
                     ["Great fit (category should definitely be primary)", 
                      "Good fit (category is fine but other categories may be better)", 
                      "OK fit (category is ok if no other category fits)", 
@@ -178,13 +179,16 @@ def main():
                     key="decision_p"
                 )
 
-                decision_s = st.radio(
-                    "If you selected Bad for primary, should the category still be secondary?",
-                    ["Great fit (category should definitely be secondary)", 
-                     "OK fit (I have no objection to listing the category as seocndary)", 
-                     "Bad fit (category should definitely not be secondary)",],
-                    key="decision_s"
-                )
+                decision_s = "N/A"
+                if(decision_p == "Bad fit (category should definitely not be primary)"):
+                    decision_s = st.radio(
+                        f"If you selected Bad for primary, should {current_cat} still be a secondary on this paper?",
+                        ["Great fit (category should definitely be secondary)", 
+                        "OK fit (I have no objection to listing the category as seocndary)", 
+                        "Bad fit (category should definitely not be secondary)",],
+                        key="decision_s"
+                    )
+
                 if st.button("Submit Classification"):
                     submit_moderation_result(paper_id, current_cat, mod_name, decision_p, decision_s)
                     # submit_moderation_result(paper_id, category_id, st.session_state["email"], decision_p, decision_s)
@@ -192,6 +196,7 @@ def main():
                     st.rerun()
 
                 st.write(f"Currently moderating **{current_cat}** under **{mod_name}**")
+                st.write(f"Currently finished moderating **{current_idx}** papers out of a total of **{len(paper_queue)}**")
 
                 # instead of Tom's #7 i want to do change cateogry and go to prev paper
                 # i think it makes sense to decouple submission and movement
