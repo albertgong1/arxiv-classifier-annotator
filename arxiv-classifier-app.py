@@ -15,18 +15,27 @@ from firebase_admin import credentials, firestore
 # https://console.firebase.google.com/u/0/project/arxiv-website/settings/serviceaccounts/adminsdk
 # https://console.cloud.google.com/firestore/databases/-default-/data/panel/mod_queues/0?authuser=0&hl=en&project=arxiv-website
 
+
+# https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management
+# https://docs.streamlit.io/develop/concepts/connections/secrets-management
+# need change to secrets instead of json for deployment
+
 # from https://firebase.google.com/docs/firestore/query-data/get-data#python
 if not firebase_admin._apps:
     # cred = credentials.Certificate('API_KEYS/arxiv-website-firebase-adminsdk-mkdbk-dc872d30e8.json')
     # point to soft link so that we don't have to modify this part of the code
-    cred = credentials.Certificate('./API_KEYS/certificate.json')
+    
+    cred = credentials.Certificate(dict(st.secrets["cred"]))#'./API_KEYS/certificate.json')
     app = firebase_admin.initialize_app(cred)
+    # see https://discuss.streamlit.io/t/how-to-use-an-entire-json-file-in-the-secrets-app-settings-when-deploying-on-the-community-cloud/49375/2
 db = firestore.client()
 
 # Load data from Firestore collections
 def load_moderation_queue(mod_name, current_cat):
     """Retrieve the list of paper IDs for the specified category from the mod_queues collection."""
     # print(str(mod_name)+":"+current_cat.split(":")[0])
+    # print("entered load mod queue")
+    print(db.collection("mod_queues").document(str(mod_name)+":"+current_cat.split(":")[0]).get())
     doc_ref = db.collection("mod_queues").document(str(mod_name)+":"+current_cat.split(":")[0])
     doc = doc_ref.get()
     # print(doc.to_dict())
@@ -133,6 +142,7 @@ def main():
     if st.button("Start Moderation"):
         st.session_state["current_cat"] = current_cat
         st.session_state["paper_queue"] = load_moderation_queue(mod_name, current_cat)
+        print(st.session_state['paper_queue'])
         st.session_state["current_paper_idx"] = 0
  
         # st.experimental_rerun()
