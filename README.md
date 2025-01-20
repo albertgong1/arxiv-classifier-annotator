@@ -10,7 +10,7 @@ streamlit run arxiv-classifier-app.py
 To install dependencies, run:
 ```
 conda create -n arxiv_website
-conda install conda-forge::streamlit 
+conda install python=3.12 conda-forge::streamlit conda-forge::bs4
 pip install firebase-admin
 ```
 
