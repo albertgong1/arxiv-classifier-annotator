@@ -1,11 +1,14 @@
-import json
+"""Streamlit app for annotating arXiv papers
+Example usage:
+```bash
+streamlit run arxiv-classifier-app.py
+```
+"""
 
-import firebase_admin
 import pandas as pd
-import requests
 import streamlit as st
-from bs4 import BeautifulSoup
-from firebase_admin import credentials, firestore
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 # to generate private API key:
 # https://console.firebase.google.com/u/0/project/arxiv-website/settings/serviceaccounts/adminsdk
@@ -16,29 +19,17 @@ from firebase_admin import credentials, firestore
 # https://console.cloud.google.com/firestore/databases/-default-/data/panel/mod_queues/0?authuser=0&hl=en&project=arxiv-website
 
 
-# https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management
-# https://docs.streamlit.io/develop/concepts/connections/secrets-management
-# need change to secrets instead of json for deployment
-
-# from https://firebase.google.com/docs/firestore/query-data/get-data#python
-if not firebase_admin._apps:
-    # cred = credentials.Certificate('API_KEYS/arxiv-website-firebase-adminsdk-mkdbk-dc872d30e8.json')
-    # point to soft link so that we don't have to modify this part of the code
-    
-    cred = credentials.Certificate(dict(st.secrets["cred"]))#'./API_KEYS/certificate.json')
-    app = firebase_admin.initialize_app(cred)
-    # see https://discuss.streamlit.io/t/how-to-use-an-entire-json-file-in-the-secrets-app-settings-when-deploying-on-the-community-cloud/49375/2
-db = firestore.client()
+from util import get_firestore
+db = get_firestore()
 
 # Load data from Firestore collections
 def load_moderation_queue(mod_name, current_cat):
     """Retrieve the list of paper IDs for the specified category from the mod_queues collection."""
-    # print(str(mod_name)+":"+current_cat.split(":")[0])
-    # print("entered load mod queue")
-    print(db.collection("mod_queues").document(str(mod_name)+":"+current_cat.split(":")[0]).get())
-    doc_ref = db.collection("mod_queues").document(str(mod_name)+":"+current_cat.split(":")[0])
+    mod_queue_id = str(mod_name)+":"+current_cat.split(":")[0]
+    logging.debug(f"Entered load mod queue for {mod_queue_id}")
+    doc_ref = db.collection("mod_queues").document(mod_queue_id)
     doc = doc_ref.get()
-    # print(doc.to_dict())
+    logging.debug(f"Document data: {doc.to_dict()}")
     if doc.exists:
         return doc.to_dict().get('queue', [])
     else:
@@ -51,39 +42,6 @@ def get_paper_info(paper_id):
     if doc.exists:
         return doc.to_dict()
     return None
-
-def get_arxiv_details_from_id(paper_id):
-    try:
-        # Construct the URL from the paper ID
-        url = f"https://arxiv.org/abs/{paper_id}"
-        
-        # Send a GET request to fetch the HTML content
-        response = requests.get(url)
-        response.raise_for_status()
-        
-        # Parse the HTML content
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # Extract the title
-        title_element = soup.find('h1', {'class': 'title mathjax'})
-        title = title_element.get_text(strip=True).replace("Title:", "") if title_element else "Title not found"
-        
-        # Extract the authors
-        author_elements = soup.find('div', {'class': 'authors'})
-        authors = author_elements.get_text(strip=True).replace("Authors:", "") if author_elements else "Authors not found"
-        
-        # Extract the abstract
-        abstract_block = soup.find('blockquote', {'class': 'abstract mathjax'})
-        abstract = abstract_block.get_text(strip=True).replace("Abstract:", "") if abstract_block else "Abstract not found"
-        
-        # Return results as a dictionary
-        return {
-            "title": title,
-            "authors": authors,
-            "abstract": abstract
-        }
-    except requests.exceptions.RequestException as e:
-        return {"Error": f"An error occurred while fetching the page: {e}"}
 
 def submit_moderation_result(paper_id, current_cat, mod_name, decision_p, decision_s):
     """Submit moderation result to the mod_results collection."""
@@ -110,18 +68,13 @@ def submit_moderation_result(paper_id, current_cat, mod_name, decision_p, decisi
     mod_queue_ref = db.collection("mod_queues").document(ref)
     mod_queue_doc = mod_queue_ref.get()
 
-    # print(mod_queue_doc.to_dict())
-
     if mod_queue_doc.exists:
         queue_data = mod_queue_doc.to_dict()
         papers = queue_data.get("queue", [])
-        # print(papers)
-        # print(paper_id)
         
         # Remove the paper_id if it's in the queue
         if paper_id in papers:
             papers.remove(paper_id)
-            # print(papers)
             mod_queue_ref.update({"queue": papers})
 
 # App UI
@@ -142,7 +95,6 @@ def main():
     if st.button("Start Moderation"):
         st.session_state["current_cat"] = current_cat
         st.session_state["paper_queue"] = load_moderation_queue(mod_name, current_cat)
-        print(st.session_state['paper_queue'])
         st.session_state["current_paper_idx"] = 0
  
         # st.experimental_rerun()
@@ -157,29 +109,15 @@ def main():
         if current_idx < len(paper_queue):
             paper_id = paper_queue[current_idx]
             paper_info = get_paper_info(paper_id)
-            paper_details = get_arxiv_details_from_id(paper_id)
 
             if paper_info:
                 # st.subheader(f"Paper ID: {paper_info['id']}")
-                st.write(f"**Title**: {paper_details['title']}")
-                st.write(f"**Authors**: {paper_details['authors']}")
-                st.write(f"**Abstract**: {paper_details['abstract']}")
-                st.write(f"[View Paper PDF]({paper_info['url']})")
+                st.write(f"**Title**: {paper_info['title']}")
+                st.write(f"**Authors**: {paper_info['authors']}")
+                st.write(f"**Abstract**: {paper_info['abstract']}")
+                st.write(f"[View Paper HTML]({paper_info['url']})")
                 # st.write("Top Categories:", paper_info["top_5_cats"])
 
-                # Moderation Decision
-                # st.write("Does this paper belong to your category?")
-                # if st.button("Yes"):
-                #     submit_moderation_result(paper_id, category_id, True)
-                #     st.session_state["current_paper_idx"] += 1
-                #     # st.experimental_rerun()
-                #     st.rerun()
-
-                # elif st.button("No"):
-                #     submit_moderation_result(paper_id, category_id, False)
-                #     st.session_state["current_paper_idx"] += 1
-                #     # st.experimental_rerun()
-                #     st.rerun()
                 decision_p = st.radio(
                     f"How well does {current_cat} fit this paper as the primary category?",
                     ["Great fit (category should definitely be primary)", 
