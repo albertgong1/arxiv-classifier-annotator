@@ -18,9 +18,13 @@ logging.basicConfig(level=logging.DEBUG)
 # https://console.firebase.google.com/u/0/project/arxiv-website/settings/serviceaccounts/adminsdk
 # https://console.cloud.google.com/firestore/databases/-default-/data/panel/mod_queues/0?authuser=0&hl=en&project=arxiv-website
 
-
-from util import get_firestore
-db = get_firestore()
+import firebase_admin
+from firebase_admin import credentials, firestore
+if not firebase_admin._apps:
+    # Get the credentials from secrets.toml
+    cred = credentials.Certificate(dict(st.secrets["firebase"]))
+    firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 # Load data from Firestore collections
 def load_moderation_queue(mod_name, current_cat):
