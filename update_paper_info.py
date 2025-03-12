@@ -22,43 +22,61 @@ Example usage:
 python update_paper_info.py -dp data/mod-queue-all2023_v2-test-pos10-neg10.json
 ```
 """
-
-# %%
-from util import parser, get_firestore
-args, _ = parser.parse_known_args()
-data_path = args.data_path
-
-# %%
-# standard imports
 import json
 from tqdm import tqdm
 import requests
 from bs4 import BeautifulSoup
+import logging
+from utils import parser, get_firestore, PAPER_INFO_COLLECTION
 
-# %%
+args, _ = parser.parse_known_args()
+data_path = args.data_path
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 def get_arxiv_details_from_id(paper_id):
     try:
         # Construct the URL from the paper ID
-        url = f"https://arxiv.org/abs/{paper_id}"
+        # TODO: get this information from the all2023_v2 split of the HF dataset
+
+        
+        url = f"https://export.arxiv.org/abs/{paper_id}"
         
         # Send a GET request to fetch the HTML content
-        response = requests.get(url)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
         
         # Parse the HTML content
         soup = BeautifulSoup(response.text, 'html.parser')
+        # import pdb; pdb.set_trace()
         
         # Extract the title
         title_element = soup.find('h1', {'class': 'title mathjax'})
-        title = title_element.get_text(strip=True).replace("Title:", "") if title_element else "Title not found"
+        if title_element:
+            title = title_element.get_text(strip=True).replace("Title:", "") 
+        else:
+            logger.warning(f"Title not found for paper at {url}")
+            title = "Title not found"
         
         # Extract the authors
         author_elements = soup.find('div', {'class': 'authors'})
-        authors = author_elements.get_text(strip=True).replace("Authors:", "") if author_elements else "Authors not found"
+        if author_elements:
+            authors = author_elements.get_text(strip=True).replace("Authors:", "")
+        else:
+            logger.warning(f"Authors not found for paper at {url}")
+            authors = "Authors not found"
         
         # Extract the abstract
         abstract_block = soup.find('blockquote', {'class': 'abstract mathjax'})
-        abstract = abstract_block.get_text(strip=True).replace("Abstract:", "") if abstract_block else "Abstract not found"
+        if abstract_block:
+            abstract = abstract_block.get_text(strip=True).replace("Abstract:", "")
+        else:
+            logger.warning(f"Abstract not found for paper at {url}")
+            abstract = "Abstract not found"
         
         # Return results as a dictionary
         return {
@@ -68,28 +86,27 @@ def get_arxiv_details_from_id(paper_id):
             "url": f"https://ar5iv.org/html/{paper_id}" # construct the ar5iv website url since this doesn't display the category
         }
     except requests.exceptions.RequestException as e:
+        logger.error(f"An error occurred while fetching the page: {e}")
         return {"Error": f"An error occurred while fetching the page: {e}"}
 
-# %%
-# read data from json file
+logger.info(f"Loading data from {data_path}")
 with open(data_path, 'r') as f:
     queues = json.load(f)
 
-# %%
-# get all paper ids in queues
+logger.info("Getting all paper ids in queues")
 paper_ids = set()
 for queue in queues.values():
     paper_ids.update(queue)
 papers_ids = list(paper_ids)
 
-# %%
+logger.info("Updating paper_info collection")
 db = get_firestore()
 # Create a write batch
 batch = db.batch()
 pbar = tqdm(enumerate(papers_ids), desc="Updating paper_info collection")
 for i, paper_id in pbar:
     # Set the data for the 'users' collection
-    doc_ref = db.collection('paper_info').document(paper_id)
+    doc_ref = db.collection(PAPER_INFO_COLLECTION).document(paper_id)
     # get paper info from arxiv abstract page
     paper_info = get_arxiv_details_from_id(paper_id)
     # NOTE: any existing data will be overwritten by the new data
@@ -99,3 +116,4 @@ for i, paper_id in pbar:
     pbar.set_description(f"Updated paper_info collection ({i+1} / {len(papers_ids)})")
 # commit the batch
 batch.commit()
+logger.info("Done!")

@@ -1,17 +1,24 @@
-
-#  %%%%%%%% Utils for data %%%%%%%%
+"""
+Utils for the arxiv-classifier project
+"""
 from argparse import ArgumentParser
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+# 
+# Data utils
+# 
 parser = ArgumentParser()
 parser.add_argument("--data_path", "-dp", type=str, 
                     default="data/mod-queue-all2023_v2-test-pos10-neg10.json",
                     help='Path to moderator queues stored as a json file')
 
-
-#  %%%%%%%% Firebase utils %%%%%%%%
-# firebase imports
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+# 
+# Firebase utils
+# 
+MODERATOR_QUEUE_COLLECTION = "mod_queues_v5"
+PAPER_INFO_COLLECTION = "paper_info_v5-export"
 
 def get_firestore():
     """Get the firestore client

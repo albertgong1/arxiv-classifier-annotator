@@ -8,18 +8,14 @@ streamlit run arxiv-classifier-app.py
 import pandas as pd
 import streamlit as st
 import logging
-logging.basicConfig(level=logging.DEBUG)
-
-# to generate private API key:
-# https://console.firebase.google.com/u/0/project/arxiv-website/settings/serviceaccounts/adminsdk
-
-# PermissionDenied: 403 Cloud Firestore API has not been used in project arxiv-website before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=arxiv-website then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [links { description: "Google developers console API activation" url: "https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=arxiv-website" } , reason: "SERVICE_DISABLED" domain: "googleapis.com" metadata { key: "service" value: "firestore.googleapis.com" } metadata { key: "consumer" value: "projects/arxiv-website" } ]
-# https://console.cloud.google.com/apis/api/firestore.googleapis.com/metrics?project=arxiv-website
-# https://console.firebase.google.com/u/0/project/arxiv-website/settings/serviceaccounts/adminsdk
-# https://console.cloud.google.com/firestore/databases/-default-/data/panel/mod_queues/0?authuser=0&hl=en&project=arxiv-website
-
 import firebase_admin
 from firebase_admin import credentials, firestore
+
+from utils import MODERATOR_QUEUE_COLLECTION, PAPER_INFO_COLLECTION
+
+logging.basicConfig(level=logging.DEBUG)
+
+
 if not firebase_admin._apps:
     # Get the credentials from secrets.toml
     cred = credentials.Certificate(dict(st.secrets["firebase"]))
@@ -28,10 +24,10 @@ db = firestore.client()
 
 # Load data from Firestore collections
 def load_moderation_queue(mod_name, current_cat):
-    """Retrieve the list of paper IDs for the specified category from the mod_queues collection."""
+    """Retrieve the list of paper IDs for the specified category from the MODERATOR_QUEUE_COLLECTION collection."""
     mod_queue_id = str(mod_name)+":"+current_cat.split(":")[0]
     logging.debug(f"Entered load mod queue for {mod_queue_id}")
-    doc_ref = db.collection("mod_queues").document(mod_queue_id)
+    doc_ref = db.collection(MODERATOR_QUEUE_COLLECTION).document(mod_queue_id)
     doc = doc_ref.get()
     logging.debug(f"Document data: {doc.to_dict()}")
     if doc.exists:
@@ -41,7 +37,7 @@ def load_moderation_queue(mod_name, current_cat):
 
 def get_paper_info(paper_id):
     """Retrieve paper information from the paper_info collection."""
-    doc_ref = db.collection("paper_info").document(paper_id)
+    doc_ref = db.collection(PAPER_INFO_COLLECTION).document(paper_id)
     doc = doc_ref.get()
     if doc.exists:
         return doc.to_dict()
@@ -69,7 +65,7 @@ def submit_moderation_result(paper_id, current_cat, mod_name, decision_p, decisi
 
     # remove paper from queue
     ref = str(mod_name)+":"+current_cat.split(":")[0]
-    mod_queue_ref = db.collection("mod_queues").document(ref)
+    mod_queue_ref = db.collection(MODERATOR_QUEUE_COLLECTION).document(ref)
     mod_queue_doc = mod_queue_ref.get()
 
     if mod_queue_doc.exists:
