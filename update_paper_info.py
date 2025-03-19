@@ -27,12 +27,13 @@ from tqdm import tqdm
 import requests
 from bs4 import BeautifulSoup
 import logging
+from datasets import load_dataset
 from utils import parser, get_firestore, PAPER_INFO_COLLECTION
 
 args, _ = parser.parse_known_args()
 data_path = args.data_path
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def get_arxiv_details_from_id(paper_id):
@@ -89,6 +90,21 @@ def get_arxiv_details_from_id(paper_id):
         logger.error(f"An error occurred while fetching the page: {e}")
         return {"Error": f"An error occurred while fetching the page: {e}"}
 
+logger.info("Loading data from HF")
+ds = load_dataset("kilian-group/arxiv-classifier", name="all2023_v2", split="test")
+map = {x["paper_id"]: x for x in tqdm(ds, desc="Constructing lookup table")}
+def get_arxiv_details_from_id_hf(paper_id):
+    # import pdb; pdb.set_trace()
+    paper = map.get(paper_id, None)
+    if paper is None:
+        raise ValueError(f"Paper not found for id {paper_id}")
+    return {
+        "title": paper["title"],
+        "authors": paper["authors"],
+        "abstract": paper["abstract"],
+        "url": f"https://ar5iv.org/html/{paper_id}"
+    }
+
 logger.info(f"Loading data from {data_path}")
 with open(data_path, 'r') as f:
     queues = json.load(f)
@@ -99,21 +115,27 @@ for queue in queues.values():
     paper_ids.update(queue)
 papers_ids = list(paper_ids)
 
-logger.info("Updating paper_info collection")
+logger.info(f"Updating collection: {PAPER_INFO_COLLECTION}")
 db = get_firestore()
-# Create a write batch
-batch = db.batch()
-pbar = tqdm(enumerate(papers_ids), desc="Updating paper_info collection")
-for i, paper_id in pbar:
-    # Set the data for the 'users' collection
-    doc_ref = db.collection(PAPER_INFO_COLLECTION).document(paper_id)
-    # get paper info from arxiv abstract page
-    paper_info = get_arxiv_details_from_id(paper_id)
-    # NOTE: any existing data will be overwritten by the new data
-    # to update the data instead of overwriting it, use the update method
-    batch.set(doc_ref, paper_info)
-    # to update the data instead of overwriting it, use the update method
-    pbar.set_description(f"Updated paper_info collection ({i+1} / {len(papers_ids)})")
-# commit the batch
-batch.commit()
+
+# Define a reasonable batch size (e.g., 250 documents per batch)
+BATCH_SIZE = 250
+
+for i in range(0, len(papers_ids), BATCH_SIZE):
+    # Create a new batch for each chunk
+    batch = db.batch()
+    
+    # Get the current chunk of paper_ids
+    chunk = papers_ids[i:i + BATCH_SIZE]
+    
+    # Process each paper in the current chunk
+    for paper_id in tqdm(chunk, desc=f"Processing batch {i//BATCH_SIZE + 1}"):
+        doc_ref = db.collection(PAPER_INFO_COLLECTION).document(paper_id)
+        paper_info = get_arxiv_details_from_id_hf(paper_id)
+        batch.set(doc_ref, paper_info)
+    
+    # Commit the current batch
+    logger.info(f"Committing batch {i//BATCH_SIZE + 1}")
+    batch.commit()
+
 logger.info("Done!")
