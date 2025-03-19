@@ -19,7 +19,7 @@ parser.add_argument("--data_path", "-dp", type=str,
 # 
 MODERATOR_QUEUE_COLLECTION = "mod_queues_v5"
 PAPER_INFO_COLLECTION = "paper_info_v5"
-
+MODERATOR_RESULTS_COLLECTION = "mod_results"
 def get_firestore():
     """Get the firestore client
     
