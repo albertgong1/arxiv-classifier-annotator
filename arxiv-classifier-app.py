@@ -11,7 +11,7 @@ import logging
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-from utils import MODERATOR_QUEUE_COLLECTION, PAPER_INFO_COLLECTION
+from utils import MODERATOR_QUEUE_COLLECTION, PAPER_INFO_COLLECTION, MODERATOR_RESULTS_COLLECTION
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -43,18 +43,19 @@ def get_paper_info(paper_id):
         return doc.to_dict()
     return None
 
-def submit_moderation_result(paper_id, current_cat, mod_name, decision_p, decision_s):
-    """Submit moderation result to the mod_results collection."""
-    # mod_result_ref = db.collection("mod_results").document(paper_id)
-    # mod_result_ref.set({
-    #     "id": paper_id,
-    #     "my_cat": str(category_id),
-    #     "in_my_cat": result
-    #     # str(category_id): result
-    # }, merge=False)
-
+def submit_moderation_result(paper_id: str, current_cat: str, mod_name: str, decision_p: str, decision_s: str) -> None:
+    """
+    Submit moderation result to the mod_results collection.
+    
+    Args:
+        paper_id: str
+        current_cat: str
+        mod_name: str
+        decision_p: str
+        decision_s: str
+    """
     # add result
-    mod_results_ref = db.collection("mod_results").document(document_id=mod_name+"_"+current_cat.split(":")[0]+"_"+paper_id)
+    mod_results_ref = db.collection(MODERATOR_RESULTS_COLLECTION).document(document_id=mod_name+"_"+current_cat.split(":")[0]+"_"+paper_id)
     mod_results_ref.set({
         "name": mod_name,
         "category": str(current_cat),
