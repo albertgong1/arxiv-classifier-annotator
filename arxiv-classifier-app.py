@@ -119,6 +119,9 @@ def main():
                 st.write(f"[View Paper HTML]({paper_info['url']})")
                 # st.write("Top Categories:", paper_info["top_5_cats"])
 
+                # TODO: by default, have nothing selected
+                # For example, if bad fit was previously selected, the bad fit expansion will be shown
+                # on the next paper.
                 decision_p = st.radio(
                     f"How well does {current_cat} fit this paper as the primary category?",
                     ["Great fit (category should definitely be primary)", 
