@@ -11,14 +11,14 @@ from firebase_admin import firestore
 # 
 parser = ArgumentParser()
 parser.add_argument("--data_path", "-dp", type=str, 
-                    default="data/mod-queue-all2023_v2-test-pos10-neg10.json",
+                    default="data/mod-queue-all2023_v2-test-pos50-neg50.json",
                     help='Path to moderator queues stored as a json file')
 
 # 
 # Firebase utils
 # 
 MODERATOR_QUEUE_COLLECTION = "mod_queues_v5"
-PAPER_INFO_COLLECTION = "paper_info_v5-export"
+PAPER_INFO_COLLECTION = "paper_info_v5"
 
 def get_firestore():
     """Get the firestore client
