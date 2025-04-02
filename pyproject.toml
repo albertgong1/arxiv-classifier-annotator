@@ -18,6 +18,7 @@ classifiers = [
 dependencies = [
     "streamlit",
     "firebase-admin",
+    "pandas",
 ]
 
 [project.urls]
