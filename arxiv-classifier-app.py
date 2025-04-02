@@ -14,7 +14,7 @@ from firebase_admin import credentials, firestore
 from utils import MODERATOR_QUEUE_COLLECTION, PAPER_INFO_COLLECTION, MODERATOR_RESULTS_COLLECTION
 
 logging.basicConfig(level=logging.DEBUG)
-
+logger = logging.getLogger(__name__)
 
 if not firebase_admin._apps:
     # Get the credentials from secrets.toml
@@ -54,6 +54,7 @@ def submit_moderation_result(paper_id: str, current_cat: str, mod_name: str, dec
         decision_p: str
         decision_s: str
     """
+    logger.info(f"Submitting moderation result for {paper_id=} with {current_cat=} under {mod_name=}")
     # add result
     mod_results_ref = db.collection(MODERATOR_RESULTS_COLLECTION).document(document_id=mod_name+"_"+current_cat.split(":")[0]+"_"+paper_id)
     mod_results_ref.set({
@@ -91,27 +92,29 @@ def main():
     _name = st.selectbox('Select your name or "Other" then input your name below', mod_cats[mod_cats['Category']==current_cat]["name"].tolist()+["Other"], placeholder="Johann Lee")
     if _name == "Other":
         newName = st.text_input("Please enter your name")
+        # TODO: check that newName is not already in the list
     mod_name = _name if _name != "Other" else newName
 
     if st.button("Start Moderation"):
-        st.session_state["current_cat"] = current_cat
-        st.session_state["paper_queue"] = load_moderation_queue(mod_name, current_cat)
-        st.session_state["current_paper_idx"] = 0
- 
-        # st.experimental_rerun()
+        st.session_state.current_cat = current_cat
+        st.session_state.paper_queue = load_moderation_queue(mod_name, current_cat)
+        st.session_state.current_paper_idx = 0
         st.rerun()
 
     # Step 2: Moderation Page
+    if 'decision_p' not in st.session_state:
+        st.session_state.decision_p = None
+    if 'decision_s' not in st.session_state:
+        st.session_state.decision_s = None
+
     if "current_cat" in st.session_state:
-        current_cat = st.session_state["current_cat"]
-        paper_queue = st.session_state["paper_queue"]
-        current_idx = st.session_state["current_paper_idx"]
+        current_cat = st.session_state.current_cat
+        paper_queue = st.session_state.paper_queue
+        current_idx = st.session_state.current_paper_idx
 
         if current_idx < len(paper_queue):
             paper_id = paper_queue[current_idx]
-            paper_info = get_paper_info(paper_id)
-
-            if paper_info:
+            if paper_info := get_paper_info(paper_id):
                 # st.subheader(f"Paper ID: {paper_info['id']}")
                 st.write(f"**Title**: {paper_info['title']}")
                 st.write(f"**Authors**: {paper_info['authors']}")
@@ -119,9 +122,6 @@ def main():
                 st.write(f"[View Paper HTML]({paper_info['url']})")
                 # st.write("Top Categories:", paper_info["top_5_cats"])
 
-                # TODO: by default, have nothing selected
-                # For example, if bad fit was previously selected, the bad fit expansion will be shown
-                # on the next paper.
                 decision_p = st.radio(
                     f"How well does {current_cat} fit this paper as the primary category?",
                     ["Great fit (category should definitely be primary)", 
@@ -132,7 +132,7 @@ def main():
                 )
 
                 decision_s = "N/A"
-                if(decision_p == "Bad fit (category should definitely not be primary)"):
+                if decision_p == "Bad fit (category should definitely not be primary)":
                     decision_s = st.radio(
                         f"If you selected Bad for primary, should {current_cat} still be a secondary on this paper?",
                         ["Great fit (category should definitely be secondary)", 
@@ -143,8 +143,10 @@ def main():
 
                 if st.button("Submit Classification"):
                     submit_moderation_result(paper_id, current_cat, mod_name, decision_p, decision_s)
-                    # submit_moderation_result(paper_id, category_id, st.session_state["email"], decision_p, decision_s)
-                    st.session_state["current_paper_idx"] += 1
+                    st.session_state.current_paper_idx += 1
+                    # remove radio buttons
+                    del st.session_state.decision_p
+                    del st.session_state.decision_s
                     st.rerun()
 
                 st.write(f"Currently moderating **{current_cat}** under **{mod_name}**")
