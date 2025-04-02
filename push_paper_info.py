@@ -1,25 +1,8 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     custom_cell_magics: kql
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.11.2
-#   kernelspec:
-#     display_name: arxiv-classifier
-#     language: python
-#     name: python3
-# ---
-
-# %%
 """Script to update the `paper_info` collection on Firestore with the data from each paper's arxiv abstract page.
 
 Example usage:
 ```bash
-python update_paper_info.py -dp data/mod-queue-all2023_v2-test-pos10-neg10.json
+python push_paper_info.py -dp data/mod-queue-all2023_v2-test-pos10-neg10.json
 ```
 """
 
