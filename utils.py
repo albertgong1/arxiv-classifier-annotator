@@ -8,6 +8,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 from tenacity import retry, stop_after_attempt, wait_exponential
+from enum import Enum
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,31 @@ parser.add_argument(
     default="data/mod-queue-all2023_v2-test-pos50-neg50.json",
     help="Path to moderator queues stored as a json file",
 )
+
+
+class PrimaryDecision(Enum):
+    """Enum for primary category decision options."""
+
+    GREAT_FIT = "Great fit (category should definitely be primary)"
+    GOOD_FIT = "Good fit (category is fine but other categories may be better)"
+    OK_FIT = "OK fit (category is ok if no other category fits)"
+    BAD_FIT = "Bad fit (category should definitely not be primary)"
+
+    def __str__(self):
+        return self.value
+
+
+class SecondaryDecision(Enum):
+    """Enum for secondary category decision options."""
+
+    GREAT_FIT = "Great fit (category should definitely be secondary)"
+    OK_FIT = "OK fit (I have no objection to listing the category as seocndary)"
+    BAD_FIT = "Bad fit (category should definitely not be secondary)"
+    N_A = "N/A"
+
+    def __str__(self):
+        return self.value
+
 
 #
 # Firebase utils

@@ -16,9 +16,11 @@ from utils import (
     MODERATOR_QUEUE_COLLECTION,
     PAPER_INFO_COLLECTION,
     MODERATOR_RESULTS_COLLECTION,
+    PrimaryDecision,
+    SecondaryDecision,
 )
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -115,7 +117,11 @@ def get_paper_info(paper_id: str) -> dict | None:
 
 
 def submit_moderation_result(
-    paper_id: str, current_cat: str, mod_name: str, decision_p: str, decision_s: str
+    paper_id: str,
+    current_cat: str,
+    mod_name: str,
+    decision_p: PrimaryDecision,
+    decision_s: SecondaryDecision,
 ) -> None:
     """Submit moderation result to the MODERATOR_RESULTS_COLLECTION collection on Firestore.
 
@@ -123,8 +129,8 @@ def submit_moderation_result(
         paper_id (str): arXiv paper ID
         current_cat (str): category
         mod_name (str): name of the moderator
-        decision_p (str): primary decision
-        decision_s (str): secondary decision
+        decision_p (PrimaryDecision): primary decision
+        decision_s (SecondaryDecision): secondary decision
 
     """
 
@@ -141,7 +147,7 @@ def submit_moderation_result(
         """
         return f"{mod_name}_{current_cat.split(':')[0]}_{paper_id}"
 
-    logger.info(
+    logger.debug(
         f"Submitting moderation result for {paper_id=} with {current_cat=} under {mod_name=}"
     )
     # add result
@@ -153,31 +159,31 @@ def submit_moderation_result(
             "name": mod_name,
             "category": str(current_cat),
             "paper_id": paper_id,
-            "primary_decision": decision_p,
-            "secondary_decision": decision_s,
+            "primary_decision": decision_p.value,
+            "secondary_decision": decision_s.value,
         }
     )
 
 
-# App UI
 def main() -> None:
     """Main function to run the Streamlit app."""
     st.title("ArXiv Paper Moderator")
     mod_cats = pd.read_csv("data/mod_cats.csv")
-    # mod_emails = pd.read_csv("data/mod_emails.csv")
     mod_cats["name"] = mod_cats["First name"] + " " + mod_cats["Last name"]
 
     # Step 1: Select moderation category
     st.header("Select Moderation Category")
-    current_cat = st.selectbox("Choose your category", mod_cats["Category"].tolist())
+    current_cat = st.selectbox(
+        "Choose your category", mod_cats["Category"].unique().tolist()
+    )
     _name = st.selectbox(
         'Select your name or "Other" then input your name below',
         mod_cats[mod_cats["Category"] == current_cat]["name"].tolist() + ["Other"],
         placeholder="Johann Lee",
     )
     if _name == "Other":
-        newName = st.text_input("Please enter your name")
-        # TODO: check that newName is not already in the list
+        # set value=None so that the user has to enter something
+        newName = st.text_input("Please enter your name", value=None)
     mod_name = _name if _name != "Other" else newName
 
     if st.button("Start Moderation"):
@@ -189,6 +195,9 @@ def main() -> None:
         st.rerun()
 
     # Step 2: Moderation Page
+    # Initialize session state variables so that `del st.session_state.decision_p`
+    # and `del st.session_state.decision_s` are always well-defined even if the
+    # user never clicks on the radio buttons
     if "decision_p" not in st.session_state:
         st.session_state.decision_p = None
     if "decision_s" not in st.session_state:
@@ -206,6 +215,7 @@ def main() -> None:
                 # NOTE: uncomment to reveal paper ID to moderator
                 # st.subheader(f"Paper ID: {paper_info['id']}")
                 st.write(f"**Title**: {paper_info['title']}")
+                # TODO: render mathjax in the abstract
                 st.write(f"**Authors**: {paper_info['authors']}")
                 st.write(f"**Abstract**: {paper_info['abstract']}")
                 st.write(f"[View Paper HTML]({paper_info['url']})")
@@ -215,39 +225,45 @@ def main() -> None:
                 decision_p = st.radio(
                     f"How well does {current_cat} fit this paper as the primary category?",
                     [
-                        "Great fit (category should definitely be primary)",
-                        "Good fit (category is fine but other categories may be better)",
-                        "OK fit (category is ok if no other category fits)",
-                        "Bad fit (category should definitely not be primary)",
+                        PrimaryDecision.GREAT_FIT,
+                        PrimaryDecision.GOOD_FIT,
+                        PrimaryDecision.OK_FIT,
+                        PrimaryDecision.BAD_FIT,
                     ],
                     key="decision_p",
                 )
-                if decision_p == "Bad fit (category should definitely not be primary)":
+                if decision_p == PrimaryDecision.BAD_FIT:
                     decision_s = st.radio(
                         f"If you selected Bad for primary, should {current_cat} still be a secondary on this paper?",
                         [
-                            "Great fit (category should definitely be secondary)",
-                            "OK fit (I have no objection to listing the category as seocndary)",
-                            "Bad fit (category should definitely not be secondary)",
+                            SecondaryDecision.GREAT_FIT,
+                            SecondaryDecision.OK_FIT,
+                            SecondaryDecision.BAD_FIT,
                         ],
                         key="decision_s",
                     )
                 else:
-                    decision_s = "N/A"
+                    decision_s = SecondaryDecision.N_A
 
-                if st.button("Submit Classification") and decision_p is not None:
+                if st.button("Submit Classification") and not (
+                    decision_p is None
+                    or (decision_p == PrimaryDecision.BAD_FIT and decision_s is None)
+                ):
                     submit_moderation_result(
                         paper_id, current_cat, mod_name, decision_p, decision_s
                     )
                     st.session_state.current_paper_idx += 1
-                    # remove radio buttons
+                    # remove radio buttons so that they are uninitialized for the next paper
                     del st.session_state.decision_p
                     del st.session_state.decision_s
                     st.rerun()
 
                 st.write(f"Currently moderating **{current_cat}** under **{mod_name}**")
+                num_finished_papers = (
+                    current_paper_idx + len(full_queue) - len(remaining_queue)
+                )
                 st.write(
-                    f"Currently finished moderating **{current_paper_idx + len(full_queue) - len(remaining_queue)}** papers out of a total of **{len(full_queue)}**"
+                    f"Currently finished moderating **{num_finished_papers}** papers out of a total of **{len(full_queue)}**"
                 )
 
             else:
