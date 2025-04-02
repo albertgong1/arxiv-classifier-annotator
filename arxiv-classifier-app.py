@@ -213,10 +213,11 @@ def main() -> None:
             paper_id = remaining_queue[current_paper_idx]
             if paper_info := get_paper_info(paper_id):
                 # NOTE: uncomment to reveal paper ID to moderator
-                # st.subheader(f"Paper ID: {paper_info['id']}")
+                logger.info(f"Paper ID: {paper_id}")
                 st.write(f"**Title**: {paper_info['title']}")
                 # TODO: render mathjax in the abstract
                 st.write(f"**Authors**: {paper_info['authors']}")
+                logger.info(f"Abstract: {paper_info['abstract']}")
                 st.write(f"**Abstract**: {paper_info['abstract']}")
                 st.write(f"[View Paper HTML]({paper_info['url']})")
                 # NOTE: uncomment to reveal the top-5 predicted categories from the model to the moderator
