@@ -9,6 +9,9 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from tenacity import retry, stop_after_attempt, wait_exponential
 from enum import Enum
+from joblib import Memory
+
+memory = Memory("cachedir")
 
 logger = logging.getLogger(__name__)
 
@@ -53,9 +56,9 @@ class SecondaryDecision(Enum):
 #
 # Firebase utils
 #
-MODERATOR_QUEUE_COLLECTION = "mod_queues_v5"
-PAPER_INFO_COLLECTION = "paper_info_v5"
-MODERATOR_RESULTS_COLLECTION = "mod_results"
+MODERATOR_QUEUE_COLLECTION = "mod_queues_v5-all2023_v2-test-pos50-neg50"
+PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50"
+MODERATOR_RESULTS_COLLECTION = "mod_results-all2023_v2-test-pos50-neg50"
 
 
 def get_firestore() -> firestore.client:
@@ -140,6 +143,7 @@ def get_arxiv_details_from_id(paper_id: str) -> dict:
         return {"Error": f"An error occurred while fetching the page: {e}"}
 
 
+@memory.cache
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=15))
 def has_ar5iv_page(paper_id: str) -> bool:
     """Check if the paper has an ar5iv page.

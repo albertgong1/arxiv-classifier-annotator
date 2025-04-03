@@ -19,6 +19,7 @@ dependencies = [
     "streamlit",
     "firebase-admin",
     "pandas",
+    "joblib",
 ]
 
 [project.urls]

@@ -34,18 +34,29 @@ db = get_firestore()
 batch = db.batch()
 queues_with_ar5iv_pages = {}
 queues_without_ar5iv_pages = {}
-for name, queue in tqdm(list(queues.items())[:5]):
+# NOTE: some papers throw a 503 error when fetching the ar5iv page
+IGNORE = [
+    "2308.16495",
+    "2308.10736",
+    "2308.07589",
+    "2308.06380",
+    "2308.06232",
+    "2307.08856",
+    "2310.17336",
+]
+for name, queue in tqdm(list(queues.items())):
     logger.info(f"Processing queue for {name}...")
     filtered_queue = []
     for paper_id in queue:
+        if paper_id in IGNORE:
+            logger.warning(f"Paper {paper_id} is in the ignore list, skipping...")
+            continue
         if has_ar5iv_page(paper_id):
             filtered_queue.append(paper_id)
         else:
             logger.warning(
                 f"Paper {paper_id} does not have an ar5iv page, removing from queue"
             )
-            # with open(f"{basename}-no_ar5iv_pages.txt", "a") as f:
-            #     f.write(f"{paper_id}\n")
     logger.info(f"Papers with ar5iv pages: {len(filtered_queue)} / {len(queue)}")
     queues_with_ar5iv_pages[name] = filtered_queue
     queues_without_ar5iv_pages[name] = [
@@ -67,5 +78,10 @@ save_path = f"no-ar5iv-{basename}"
 logger.info(f"Saving queues without ar5iv pages to {save_path}...")
 with open(save_path, "w") as f:
     json.dump(queues_without_ar5iv_pages, f, indent=4)
+
+save_path = f"ignore-{basename}"
+logger.info(f"Saving ignore list to {save_path}...")
+with open(save_path, "w") as f:
+    json.dump(IGNORE, f, indent=4)
 
 logger.info("Done!")
