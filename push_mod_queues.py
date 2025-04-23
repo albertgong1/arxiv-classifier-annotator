@@ -48,15 +48,18 @@ for name, queue in tqdm(list(queues.items())):
     logger.info(f"Processing queue for {name}...")
     filtered_queue = []
     for paper_id in queue:
-        if paper_id in IGNORE:
-            logger.warning(f"Paper {paper_id} is in the ignore list, skipping...")
-            continue
-        if has_ar5iv_page(paper_id):
-            filtered_queue.append(paper_id)
+        if False:
+            if paper_id in IGNORE:
+                logger.warning(f"Paper {paper_id} is in the ignore list, skipping...")
+                continue
+            if has_ar5iv_page(paper_id):
+                filtered_queue.append(paper_id)
+            else:
+                logger.warning(
+                    f"Paper {paper_id} does not have an ar5iv page, removing from queue"
+                )
         else:
-            logger.warning(
-                f"Paper {paper_id} does not have an ar5iv page, removing from queue"
-            )
+            filtered_queue.append(paper_id)
     logger.info(f"Papers with ar5iv pages: {len(filtered_queue)} / {len(queue)}")
     queues_with_ar5iv_pages[name] = filtered_queue
     queues_without_ar5iv_pages[name] = [
