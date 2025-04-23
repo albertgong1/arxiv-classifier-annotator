@@ -59,9 +59,9 @@ class SecondaryDecision(Enum):
 # MODERATOR_QUEUE_COLLECTION = "mod_queues_v5-all2023_v2-test-pos50-neg50"
 # PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50"
 # MODERATOR_RESULTS_COLLECTION = "mod_results-all2023_v2-test-pos50-neg50"
-MODERATOR_QUEUE_COLLECTION = "mod_queues_v5-all2023_v2-test-pos50-neg50-ar5iv"
-PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50-ar5iv"
-MODERATOR_RESULTS_COLLECTION = "mod_results-all2023_v2-test-pos50-neg50-ar5iv"
+MODERATOR_QUEUE_COLLECTION = "mod_queues_v5-all2023_v2-test-pos50-neg50-ar5iv-2"
+PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50-ar5iv-2"
+MODERATOR_RESULTS_COLLECTION = "mod_results-all2023_v2-test-pos50-neg50-ar5iv-2"
 
 
 def get_firestore() -> firestore.client:
