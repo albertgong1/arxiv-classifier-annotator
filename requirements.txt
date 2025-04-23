@@ -1,0 +1,4 @@
+firebase-admin
+joblib
+pandas
+streamlit
