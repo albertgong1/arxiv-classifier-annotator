@@ -45,7 +45,7 @@ class SecondaryDecision(Enum):
     """Enum for secondary category decision options."""
 
     GREAT_FIT = "Great fit (category should definitely be secondary)"
-    OK_FIT = "OK fit (I have no objection to listing the category as seocndary)"
+    OK_FIT = "OK fit (I have no objection to listing the category as secondary)"
     BAD_FIT = "Bad fit (category should definitely not be secondary)"
     N_A = "N/A"
 
