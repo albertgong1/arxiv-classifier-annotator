@@ -32,9 +32,9 @@ parser.add_argument(
 class PrimaryDecision(Enum):
     """Enum for primary category decision options."""
 
-    GREAT_FIT = "Great fit (category should definitely be primary)"
-    GOOD_FIT = "Good fit (category is fine but other categories may be better)"
-    OK_FIT = "OK fit (category is ok if no other category fits)"
+    GREAT_FIT = "Great fit (no other category would be better)"
+    GOOD_FIT = "Good fit (category is fine, but other categories may be better)"
+    OK_FIT = "OK fit (category is ok, but it is very likely that some other category would be better)"
     BAD_FIT = "Bad fit (category should definitely not be primary)"
 
     def __str__(self):
@@ -44,6 +44,7 @@ class PrimaryDecision(Enum):
 class SecondaryDecision(Enum):
     """Enum for secondary category decision options."""
 
+    # GREAT_FIT = "Great fit (category should definitely be secondary)"
     GREAT_FIT = "Great fit (category should definitely be secondary)"
     OK_FIT = "OK fit (I have no objection to listing the category as secondary)"
     BAD_FIT = "Bad fit (category should definitely not be secondary)"
@@ -59,9 +60,20 @@ class SecondaryDecision(Enum):
 # MODERATOR_QUEUE_COLLECTION = "mod_queues_v5-all2023_v2-test-pos50-neg50"
 # PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50"
 # MODERATOR_RESULTS_COLLECTION = "mod_results-all2023_v2-test-pos50-neg50"
-MODERATOR_QUEUE_COLLECTION = "mod_queues_v5-all2023_v2-test-pos50-neg50-ar5iv-2"
-PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50-ar5iv-2"
-MODERATOR_RESULTS_COLLECTION = "mod_results-all2023_v2-test-pos50-neg50-ar5iv-2"
+if False:
+    # Production collections
+    MODERATOR_QUEUE_COLLECTION = "mod_queues_v5-all2023_v2-test-pos50-neg50-ar5iv-2"
+    PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50-ar5iv-2"
+    MODERATOR_RESULTS_COLLECTION = "mod_results-all2023_v2-test-pos50-neg50-ar5iv-2"
+else:
+    # Development collections
+    MODERATOR_QUEUE_COLLECTION = (
+        "mod_queues_v5-all2023_v2-test-pos50-neg50-ar5iv-develop"
+    )
+    PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50-ar5iv-develop"
+    MODERATOR_RESULTS_COLLECTION = (
+        "mod_results-all2023_v2-test-pos50-neg50-ar5iv-develop"
+    )
 
 
 def get_firestore() -> firestore.client:

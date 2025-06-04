@@ -171,30 +171,35 @@ def main() -> None:
     mod_cats = pd.read_csv("data/mod_cats.csv")
     mod_cats["name"] = mod_cats["First name"] + " " + mod_cats["Last name"]
 
+    #
     # Step 1: Select moderation category
-    st.header("Select Moderation Category")
-    current_cat = st.selectbox(
-        "Choose your category", mod_cats["Category"].unique().tolist()
-    )
-    _name = st.selectbox(
-        'Select your name or "Other" then input your name below',
-        mod_cats[mod_cats["Category"] == current_cat]["name"].tolist() + ["Other"],
-        placeholder="Johann Lee",
-    )
-    if _name == "Other":
-        # set value=None so that the user has to enter something
-        newName = st.text_input("Please enter your name", value=None)
-    mod_name = _name if _name != "Other" else newName
-
-    if st.button("Start Moderation"):
-        st.session_state.current_cat = current_cat
-        st.session_state.full_queue, st.session_state.remaining_queue = (
-            load_moderation_queue(mod_name, current_cat)
+    #
+    if "current_cat" not in st.session_state:
+        st.header("Select Moderation Category")
+        current_cat = st.selectbox(
+            "Choose your category", mod_cats["Category"].unique().tolist()
         )
-        st.session_state.current_paper_idx = 0
-        st.rerun()
+        _name = st.selectbox(
+            'Select your name or "Other" then input your name below',
+            mod_cats[mod_cats["Category"] == current_cat]["name"].tolist() + ["Other"],
+            placeholder="Johann Lee",
+        )
+        if _name == "Other":
+            # set value=None so that the user has to enter something
+            newName = st.text_input("Please enter your name", value=None)
+        st.session_state.mod_name = _name if _name != "Other" else newName
 
+        if st.button("Start Moderation"):
+            st.session_state.current_cat = current_cat
+            st.session_state.full_queue, st.session_state.remaining_queue = (
+                load_moderation_queue(st.session_state.mod_name, current_cat)
+            )
+            st.session_state.current_paper_idx = 0
+            st.rerun()
+
+    #
     # Step 2: Moderation Page
+    #
     # Initialize session state variables so that `del st.session_state.decision_p`
     # and `del st.session_state.decision_s` are always well-defined even if the
     # user never clicks on the radio buttons
@@ -233,9 +238,13 @@ def main() -> None:
                     ],
                     key="decision_p",
                 )
-                if decision_p == PrimaryDecision.BAD_FIT:
+                if decision_p in [
+                    PrimaryDecision.GOOD_FIT,
+                    PrimaryDecision.OK_FIT,
+                    PrimaryDecision.BAD_FIT,
+                ]:
                     decision_s = st.radio(
-                        f"If you selected Bad for primary, should {current_cat} still be a secondary on this paper?",
+                        f"Should {current_cat} still be a secondary on this paper?",
                         [
                             SecondaryDecision.GREAT_FIT,
                             SecondaryDecision.OK_FIT,
@@ -251,7 +260,11 @@ def main() -> None:
                     or (decision_p == PrimaryDecision.BAD_FIT and decision_s is None)
                 ):
                     submit_moderation_result(
-                        paper_id, current_cat, mod_name, decision_p, decision_s
+                        paper_id,
+                        current_cat,
+                        st.session_state.mod_name,
+                        decision_p,
+                        decision_s,
                     )
                     st.session_state.current_paper_idx += 1
                     # remove radio buttons so that they are uninitialized for the next paper
@@ -259,7 +272,9 @@ def main() -> None:
                     del st.session_state.decision_s
                     st.rerun()
 
-                st.write(f"Currently moderating **{current_cat}** under **{mod_name}**")
+                st.write(
+                    f"Currently moderating **{current_cat}** under **{st.session_state.mod_name}**"
+                )
                 num_finished_papers = (
                     current_paper_idx + len(full_queue) - len(remaining_queue)
                 )
@@ -271,7 +286,14 @@ def main() -> None:
                 st.error("Paper information not found.")
 
         else:
+            #
+            # Step 3: Return to moderation category selection
+            #
             st.success("You have completed all papers in this category!")
+
+            if st.button("Moderate Another Category"):
+                del st.session_state.current_cat
+                st.rerun()
 
 
 if __name__ == "__main__":
