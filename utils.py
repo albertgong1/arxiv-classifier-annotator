@@ -41,13 +41,24 @@ class PrimaryDecision(Enum):
         return self.value
 
 
-class SecondaryDecision(Enum):
-    """Enum for secondary category decision options."""
+class SecondaryDecisionUponGoodOK(Enum):
+    """Enum for secondary category decision options conditional on the primary category being good or ok."""
 
-    # GREAT_FIT = "Great fit (category should definitely be secondary)"
-    GREAT_FIT = "Great fit (category should definitely be secondary)"
-    OK_FIT = "OK fit (I have no objection to listing the category as secondary)"
-    BAD_FIT = "Bad fit (category should definitely not be secondary)"
+    GOOD_FIT = "Good Fit (category should definitely be secondary if it is not primary)"
+    OK_FIT = "OK Fit (I have no objection to listing the category as secondary)"
+    BAD_FIT = "Bad Fit (category should definitely not be secondary)"
+    N_A = "N/A"
+
+    def __str__(self):
+        return self.value
+
+
+class SecondaryDecisionUponBad(Enum):
+    """Enum for secondary category decision options conditional on the primary category being bad."""
+
+    GREAT_FIT = "Great Fit (category should definitely be secondary)"
+    OK_FIT = "OK Fit (I have no objection to listing the category as secondary)"
+    BAD_FIT = "Bad Fit (category should definitely not be secondary)"
     N_A = "N/A"
 
     def __str__(self):
@@ -60,11 +71,11 @@ class SecondaryDecision(Enum):
 # MODERATOR_QUEUE_COLLECTION = "mod_queues_v5-all2023_v2-test-pos50-neg50"
 # PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50"
 # MODERATOR_RESULTS_COLLECTION = "mod_results-all2023_v2-test-pos50-neg50"
-if False:
+if True:
     # Production collections
-    MODERATOR_QUEUE_COLLECTION = "mod_queues_v5-all2023_v2-test-pos50-neg50-ar5iv-2"
-    PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50-ar5iv-2"
-    MODERATOR_RESULTS_COLLECTION = "mod_results-all2023_v2-test-pos50-neg50-ar5iv-2"
+    MODERATOR_QUEUE_COLLECTION = "mod_queues_v5-all2023_v2-test-pos50-neg50-ar5iv-3"
+    PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50-ar5iv-3"
+    MODERATOR_RESULTS_COLLECTION = "mod_results-all2023_v2-test-pos50-neg50-ar5iv-3"
 else:
     # Development collections
     MODERATOR_QUEUE_COLLECTION = (

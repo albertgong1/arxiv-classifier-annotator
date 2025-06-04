@@ -17,7 +17,8 @@ from utils import (
     PAPER_INFO_COLLECTION,
     MODERATOR_RESULTS_COLLECTION,
     PrimaryDecision,
-    SecondaryDecision,
+    SecondaryDecisionUponGoodOK,
+    SecondaryDecisionUponBad,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -121,7 +122,7 @@ def submit_moderation_result(
     current_cat: str,
     mod_name: str,
     decision_p: PrimaryDecision,
-    decision_s: SecondaryDecision,
+    decision_s: SecondaryDecisionUponGoodOK | SecondaryDecisionUponBad | None,
 ) -> None:
     """Submit moderation result to the MODERATOR_RESULTS_COLLECTION collection on Firestore.
 
@@ -130,7 +131,8 @@ def submit_moderation_result(
         current_cat (str): category
         mod_name (str): name of the moderator
         decision_p (PrimaryDecision): primary decision
-        decision_s (SecondaryDecision): secondary decision
+        decision_s (SecondaryDecisionUponGoodOK | SecondaryDecisionUponBad | None): secondary decision
+            None if the primary decision is Great Fit
 
     """
 
@@ -160,7 +162,7 @@ def submit_moderation_result(
             "category": str(current_cat),
             "paper_id": paper_id,
             "primary_decision": decision_p.value,
-            "secondary_decision": decision_s.value,
+            "secondary_decision": decision_s.value if decision_s else None,
         }
     )
 
@@ -238,26 +240,32 @@ def main() -> None:
                     ],
                     key="decision_p",
                 )
-                if decision_p in [
-                    PrimaryDecision.GOOD_FIT,
-                    PrimaryDecision.OK_FIT,
-                    PrimaryDecision.BAD_FIT,
-                ]:
+                if decision_p in [PrimaryDecision.GOOD_FIT, PrimaryDecision.OK_FIT]:
                     decision_s = st.radio(
                         f"Should {current_cat} still be a secondary on this paper?",
                         [
-                            SecondaryDecision.GREAT_FIT,
-                            SecondaryDecision.OK_FIT,
-                            SecondaryDecision.BAD_FIT,
+                            SecondaryDecisionUponGoodOK.GOOD_FIT,
+                            SecondaryDecisionUponGoodOK.OK_FIT,
+                            SecondaryDecisionUponGoodOK.BAD_FIT,
+                        ],
+                        key="decision_s",
+                    )
+                elif decision_p == PrimaryDecision.BAD_FIT:
+                    decision_s = st.radio(
+                        f"Should {current_cat} still be a secondary on this paper?",
+                        [
+                            SecondaryDecisionUponBad.GREAT_FIT,
+                            SecondaryDecisionUponBad.OK_FIT,
+                            SecondaryDecisionUponBad.BAD_FIT,
                         ],
                         key="decision_s",
                     )
                 else:
-                    decision_s = SecondaryDecision.N_A
+                    decision_s = None
 
                 if st.button("Submit Classification") and not (
                     decision_p is None
-                    or (decision_p == PrimaryDecision.BAD_FIT and decision_s is None)
+                    or (decision_p != PrimaryDecision.GREAT_FIT and decision_s is None)
                 ):
                     submit_moderation_result(
                         paper_id,
