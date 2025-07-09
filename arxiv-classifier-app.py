@@ -239,6 +239,7 @@ def main() -> None:
                         PrimaryDecision.BAD_FIT,
                     ],
                     key="decision_p",
+                    index=None,
                 )
                 if decision_p in [PrimaryDecision.GOOD_FIT, PrimaryDecision.OK_FIT]:
                     decision_s = st.radio(
@@ -249,6 +250,7 @@ def main() -> None:
                             SecondaryDecisionUponGoodOK.BAD_FIT,
                         ],
                         key="decision_s",
+                        index=None,
                     )
                 elif decision_p == PrimaryDecision.BAD_FIT:
                     decision_s = st.radio(
@@ -259,26 +261,32 @@ def main() -> None:
                             SecondaryDecisionUponBad.BAD_FIT,
                         ],
                         key="decision_s",
+                        index=None,
                     )
                 else:
                     decision_s = None
 
-                if st.button("Submit Classification") and not (
+                is_valid_submission = not (
                     decision_p is None
                     or (decision_p != PrimaryDecision.GREAT_FIT and decision_s is None)
-                ):
-                    submit_moderation_result(
-                        paper_id,
-                        current_cat,
-                        st.session_state.mod_name,
-                        decision_p,
-                        decision_s,
-                    )
-                    st.session_state.current_paper_idx += 1
-                    # remove radio buttons so that they are uninitialized for the next paper
-                    del st.session_state.decision_p
-                    del st.session_state.decision_s
-                    st.rerun()
+                )
+
+                if st.button("Submit Classification"):
+                    if is_valid_submission:
+                        submit_moderation_result(
+                            paper_id,
+                            current_cat,
+                            st.session_state.mod_name,
+                            decision_p,
+                            decision_s,
+                        )
+                        st.session_state.current_paper_idx += 1
+                        # remove radio buttons so that they are uninitialized for the next paper
+                        del st.session_state.decision_p
+                        del st.session_state.decision_s
+                        st.rerun()
+                    else:
+                        st.error("Please make a selection.")
 
                 st.write(
                     f"Currently moderating **{current_cat}** under **{st.session_state.mod_name}**"
