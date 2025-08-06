@@ -9,6 +9,7 @@ streamlit run arxiv-classifier-app.py
 import pandas as pd
 import streamlit as st
 import logging
+import random
 import firebase_admin
 from firebase_admin import credentials, firestore
 from firebase_admin.firestore import FieldFilter
@@ -90,6 +91,15 @@ def load_moderation_queue(
         else:
             logger.info(f"No existing results found for {mod_name=} and {current_cat=}")
             remaining_queue = full_queue
+
+        # We shuffle the remaining_queue in place to randomize the order in which
+        # papers are presented to the moderator. The random seed is set using a
+        # string based on the moderator's name and current category to ensure that
+        # the order is consistent (deterministic) for each moderator-category pair
+        # across sessions. However, if the moderator submits a paper and refreshes
+        # the page, the order will be randomized again.
+        random.seed(f"{mod_name}_{current_cat}")
+        random.shuffle(remaining_queue)
         return full_queue, remaining_queue
     else:
         logger.warning(
