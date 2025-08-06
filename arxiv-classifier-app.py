@@ -66,11 +66,11 @@ def load_moderation_queue(
         return f"{mod_name}:{current_cat.split(':')[0]}"
 
     mod_queue_id = format_mod_queue_id(mod_name, current_cat)
-    logger.debug(f"Getting queue for {mod_queue_id=}")
+    logger.info(f"Getting queue for {mod_queue_id=}")
     doc = db.collection(MODERATOR_QUEUE_COLLECTION).document(mod_queue_id).get()
     if doc.exists:
         full_queue = doc.to_dict().get("queue", [])
-        logger.debug(f"Loaded queue with {len(full_queue)} papers")
+        logger.info(f"Loaded queue with {len(full_queue)} papers")
         # Query the MODERATOR_RESULTS_COLLECTION where "name" == mod_name and "category" == current_cat
         results = (
             db.collection(MODERATOR_RESULTS_COLLECTION)
@@ -80,19 +80,15 @@ def load_moderation_queue(
         )
         if results:
             results_ids = [result.to_dict().get("paper_id") for result in results]
-            logger.debug(
+            logger.info(
                 f"Found {len(results_ids)} existing results for {mod_name=} and {current_cat=}"
             )
             remaining_queue = [
                 paper_id for paper_id in full_queue if paper_id not in results_ids
             ]
-            logger.debug(
-                f"Returning queue with {len(remaining_queue)} remaining papers"
-            )
+            logger.info(f"Returning queue with {len(remaining_queue)} remaining papers")
         else:
-            logger.debug(
-                f"No existing results found for {mod_name=} and {current_cat=}"
-            )
+            logger.info(f"No existing results found for {mod_name=} and {current_cat=}")
             remaining_queue = full_queue
         return full_queue, remaining_queue
     else:
@@ -117,6 +113,33 @@ def get_paper_info(paper_id: str) -> dict | None:
     return None
 
 
+def format_mod_results_id(mod_name: str, current_cat: str, paper_id: str) -> str:
+    """Format the moderation result document ID.
+
+    Args:
+        mod_name (str): name of the moderator
+        current_cat (str): category
+        paper_id (str): arXiv paper ID
+    Returns:
+        str: formatted moderation result document ID
+
+    """
+    return f"{mod_name}_{current_cat.split(':')[0]}_{paper_id}"
+
+
+def delete_moderation_result(
+    paper_id: str,
+    current_cat: str,
+    mod_name: str,
+) -> None:
+    """Delete moderation result from the MODERATOR_RESULTS_COLLECTION collection on Firestore."""
+    logger.warning(
+        f"Deleting moderation result for {paper_id=} with {current_cat=} under {mod_name=}"
+    )
+    doc_id = format_mod_results_id(mod_name, current_cat, paper_id)
+    db.collection(MODERATOR_RESULTS_COLLECTION).document(doc_id).delete()
+
+
 def submit_moderation_result(
     paper_id: str,
     current_cat: str,
@@ -135,21 +158,7 @@ def submit_moderation_result(
             None if the primary decision is Great Fit
 
     """
-
-    def format_mod_results_id(mod_name: str, current_cat: str, paper_id: str) -> str:
-        """Format the moderation result document ID.
-
-        Args:
-            mod_name (str): name of the moderator
-            current_cat (str): category
-            paper_id (str): arXiv paper ID
-        Returns:
-            str: formatted moderation result document ID
-
-        """
-        return f"{mod_name}_{current_cat.split(':')[0]}_{paper_id}"
-
-    logger.debug(
+    logger.warning(
         f"Submitting moderation result for {paper_id=} with {current_cat=} under {mod_name=}"
     )
     # add result
@@ -220,11 +229,11 @@ def main() -> None:
             paper_id = remaining_queue[current_paper_idx]
             if paper_info := get_paper_info(paper_id):
                 # NOTE: uncomment to reveal paper ID to moderator
-                logger.info(f"Paper ID: {paper_id}")
+                logger.debug(f"Paper ID: {paper_id}")
                 st.write(f"**Title**: {paper_info['title']}")
                 # TODO: render mathjax in the abstract
                 st.write(f"**Authors**: {paper_info['authors']}")
-                logger.info(f"Abstract: {paper_info['abstract']}")
+                logger.debug(f"Abstract: {paper_info['abstract']}")
                 st.write(f"**Abstract**: {paper_info['abstract']}")
                 st.write(f"[View Paper HTML]({paper_info['url']})")
                 # NOTE: uncomment to reveal the top-5 predicted categories from the model to the moderator
@@ -271,22 +280,37 @@ def main() -> None:
                     or (decision_p != PrimaryDecision.GREAT_FIT and decision_s is None)
                 )
 
-                if st.button("Submit Classification"):
-                    if is_valid_submission:
-                        submit_moderation_result(
-                            paper_id,
-                            current_cat,
-                            st.session_state.mod_name,
-                            decision_p,
-                            decision_s,
-                        )
-                        st.session_state.current_paper_idx += 1
-                        # remove radio buttons so that they are uninitialized for the next paper
-                        del st.session_state.decision_p
-                        del st.session_state.decision_s
-                        st.rerun()
-                    else:
-                        st.error("Please make a selection.")
+                col1, col2 = st.columns(2)
+                with col1:
+                    if st.button("Submit Classification"):
+                        if is_valid_submission:
+                            submit_moderation_result(
+                                paper_id,
+                                current_cat,
+                                st.session_state.mod_name,
+                                decision_p,
+                                decision_s,
+                            )
+                            st.session_state.current_paper_idx += 1
+                            # remove radio buttons so that they are uninitialized for the next paper
+                            del st.session_state.decision_p
+                            del st.session_state.decision_s
+                            st.rerun()
+                        else:
+                            st.error("Please make a selection.")
+                with col2:
+                    if st.session_state.current_paper_idx > 0:
+                        if st.button("Back"):
+                            # reverse the effects of the previous submission
+                            previous_paper_idx = st.session_state.current_paper_idx - 1
+                            paper_id_to_delete = remaining_queue[previous_paper_idx]
+                            delete_moderation_result(
+                                paper_id_to_delete,
+                                current_cat,
+                                st.session_state.mod_name,
+                            )
+                            st.session_state.current_paper_idx -= 1
+                            st.rerun()
 
                 st.write(
                     f"Currently moderating **{current_cat}** under **{st.session_state.mod_name}**"
