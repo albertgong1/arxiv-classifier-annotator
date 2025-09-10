@@ -27,3 +27,4 @@ save_path = os.path.join(
     results_dir, f"mod_results-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
 )
 mod_results_df.to_csv(save_path, index=False)
+print(f"saved results to {save_path}")
