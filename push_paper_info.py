@@ -12,8 +12,16 @@ import logging
 from datasets import load_dataset
 from utils import parser, get_firestore, PAPER_INFO_COLLECTION
 
+parser.add_argument(
+    "--paper_info_collection",
+    "-pic",
+    type=str,
+    default=PAPER_INFO_COLLECTION,
+    help="Firestore collection to update",
+)
 args, _ = parser.parse_known_args()
 data_path = args.data_path
+paper_info_collection = args.paper_info_collection
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,7 +62,7 @@ for queue in queues.values():
     paper_ids.update(queue)
 papers_ids = list(paper_ids)
 
-logger.info(f"Updating collection: {PAPER_INFO_COLLECTION}")
+logger.info(f"Updating collection: {paper_info_collection}")
 db = get_firestore()
 
 # Define a reasonable batch size (e.g., 250 documents per batch)
@@ -69,7 +77,7 @@ for i in range(0, len(papers_ids), BATCH_SIZE):
 
     # Process each paper in the current chunk
     for paper_id in tqdm(chunk, desc=f"Processing batch {i // BATCH_SIZE + 1}"):
-        doc_ref = db.collection(PAPER_INFO_COLLECTION).document(paper_id)
+        doc_ref = db.collection(paper_info_collection).document(paper_id)
         paper_info = get_arxiv_details_from_id_hf(paper_id)
         batch.set(doc_ref, paper_info)
 

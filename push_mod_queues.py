@@ -17,12 +17,21 @@ from tqdm import tqdm
 import os
 from utils import parser, get_firestore, MODERATOR_QUEUE_COLLECTION, has_ar5iv_page
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+parser.add_argument(
+    "--mod_queue_collection",
+    "-mqc",
+    type=str,
+    default=MODERATOR_QUEUE_COLLECTION,
+    help="Firestore collection to update",
+)
 args = parser.parse_args()
 data_path = args.data_path
+mod_queue_collection = args.mod_queue_collection
 
 basename = os.path.basename(data_path)
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 logger.info(f"Loading data from {data_path}")
 with open(data_path, "r") as f:
@@ -65,7 +74,7 @@ for name, queue in tqdm(list(queues.items())):
     queues_without_ar5iv_pages[name] = [
         paper_id for paper_id in queue if paper_id not in filtered_queue
     ]
-    doc_ref = db.collection(MODERATOR_QUEUE_COLLECTION).document(name)
+    doc_ref = db.collection(mod_queue_collection).document(name)
     # NOTE: any existing data will be overwritten by the new data
     # to update the data instead of overwriting it, use the update method
     batch.set(doc_ref, {"queue": filtered_queue})
