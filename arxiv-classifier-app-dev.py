@@ -254,8 +254,21 @@ def main() -> None:
                 # NOTE: uncomment to reveal the top-5 predicted categories from the model to the moderator
                 # st.write("Top Categories:", paper_info["top_5_cats"])
 
+                st.markdown(
+                    f"""
+                <h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0px; padding-bottom: 0px;'>
+                How well does {current_cat} fit this paper as the primary category?
+                </h3>
+                <style>
+                div[data-testid="stRadio"] > div {{
+                    margin-top: -20px;
+                }}
+                </style>
+                """,
+                    unsafe_allow_html=True,
+                )
                 decision_p = st.radio(
-                    f"How well does {current_cat} fit this paper as the primary category?",
+                    "",
                     [
                         PrimaryDecision.GREAT_FIT,
                         PrimaryDecision.GOOD_FIT,
@@ -266,8 +279,21 @@ def main() -> None:
                     index=None,
                 )
                 if decision_p in [PrimaryDecision.GOOD_FIT, PrimaryDecision.OK_FIT]:
+                    st.markdown(
+                        f"""
+                    <h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0px; padding-bottom: 0px;'>
+                    Should {current_cat} still be a secondary on this paper?
+                    </h3>
+                    <style>
+                    div[data-testid="stRadio"] > div {{
+                        margin-top: -20px;
+                    }}
+                    </style>
+                    """,
+                        unsafe_allow_html=True,
+                    )
                     decision_s = st.radio(
-                        f"Should {current_cat} still be a secondary on this paper?",
+                        "",
                         [
                             SecondaryDecisionUponGoodOK.GOOD_FIT,
                             SecondaryDecisionUponGoodOK.OK_FIT,
@@ -277,8 +303,21 @@ def main() -> None:
                         index=None,
                     )
                 elif decision_p == PrimaryDecision.BAD_FIT:
+                    st.markdown(
+                        f"""
+                    <h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0px; padding-bottom: 0px;'>
+                    Should {current_cat} still be a secondary on this paper?
+                    </h3>
+                    <style>
+                    div[data-testid="stRadio"] > div {{
+                        margin-top: -20px;
+                    }}
+                    </style>
+                    """,
+                        unsafe_allow_html=True,
+                    )
                     decision_s = st.radio(
-                        f"Should {current_cat} still be a secondary on this paper?",
+                        "",
                         [
                             SecondaryDecisionUponBad.GREAT_FIT,
                             SecondaryDecisionUponBad.OK_FIT,
