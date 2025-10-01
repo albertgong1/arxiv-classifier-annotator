@@ -19,13 +19,26 @@ from utils import (
     SecondaryDecisionUponBad,
 )
 
-MODERATOR_QUEUE_COLLECTION = (
-    "mod_queues_v5-all2023_v2-test-pos50-neg50-ar5iv-develop-0909"
-)
-PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50-ar5iv-develop-0909"
-MODERATOR_RESULTS_COLLECTION = (
-    "mod_results-all2023_v2-test-pos50-neg50-ar5iv-develop-0909"
-)
+if False:
+    MODERATOR_QUEUE_COLLECTION = (
+        "mod_queues_v5-all2023_v2-test-pos50-neg50-ar5iv-develop-0909"
+    )
+    PAPER_INFO_COLLECTION = (
+        "paper_info_v5-all2023_v2-test-pos50-neg50-ar5iv-develop-0909"
+    )
+    MODERATOR_RESULTS_COLLECTION = (
+        "mod_results-all2023_v2-test-pos50-neg50-ar5iv-develop-0909"
+    )
+else:
+    MODERATOR_QUEUE_COLLECTION = (
+        "mod_queues_v5-all2023_v2-test-pos50-neg50-ar5iv-develop-1001"
+    )
+    PAPER_INFO_COLLECTION = (
+        "paper_info_v5-all2023_v2-test-pos50-neg50-ar5iv-develop-1001"
+    )
+    MODERATOR_RESULTS_COLLECTION = (
+        "mod_results-all2023_v2-test-pos50-neg50-ar5iv-develop-1001"
+    )
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
