@@ -14,13 +14,14 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from firebase_admin.firestore import FieldFilter
 from utils import (
-    MODERATOR_QUEUE_COLLECTION,
-    PAPER_INFO_COLLECTION,
-    MODERATOR_RESULTS_COLLECTION,
     PrimaryDecision,
     SecondaryDecisionUponGoodOK,
     SecondaryDecisionUponBad,
 )
+
+MODERATOR_QUEUE_COLLECTION = "mod_queues_v5-all2023_v2-test-pos50-neg50-ar5iv-1001"
+PAPER_INFO_COLLECTION = "paper_info_v5-all2023_v2-test-pos50-neg50-ar5iv-1001"
+MODERATOR_RESULTS_COLLECTION = "mod_results-all2023_v2-test-pos50-neg50-ar5iv-1001"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -189,7 +190,7 @@ def submit_moderation_result(
 def main() -> None:
     """Main function to run the Streamlit app."""
     st.title("ArXiv Paper Moderator")
-    mod_cats = pd.read_csv("data/mod_cats.csv")
+    mod_cats = pd.read_csv("data/mod_cats-2025-09-10.csv")
     mod_cats["name"] = mod_cats["First name"] + " " + mod_cats["Last name"]
 
     #
@@ -249,8 +250,21 @@ def main() -> None:
                 # NOTE: uncomment to reveal the top-5 predicted categories from the model to the moderator
                 # st.write("Top Categories:", paper_info["top_5_cats"])
 
+                st.markdown(
+                    f"""
+                <h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0px; padding-bottom: 0px;'>
+                How well does {current_cat} fit this paper as the primary category?
+                </h3>
+                <style>
+                div[data-testid="stRadio"] > div {{
+                    margin-top: -20px;
+                }}
+                </style>
+                """,
+                    unsafe_allow_html=True,
+                )
                 decision_p = st.radio(
-                    f"How well does {current_cat} fit this paper as the primary category?",
+                    "",
                     [
                         PrimaryDecision.GREAT_FIT,
                         PrimaryDecision.GOOD_FIT,
@@ -261,8 +275,21 @@ def main() -> None:
                     index=None,
                 )
                 if decision_p in [PrimaryDecision.GOOD_FIT, PrimaryDecision.OK_FIT]:
+                    st.markdown(
+                        f"""
+                    <h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0px; padding-bottom: 0px;'>
+                    Should {current_cat} still be a secondary on this paper?
+                    </h3>
+                    <style>
+                    div[data-testid="stRadio"] > div {{
+                        margin-top: -20px;
+                    }}
+                    </style>
+                    """,
+                        unsafe_allow_html=True,
+                    )
                     decision_s = st.radio(
-                        f"Should {current_cat} still be a secondary on this paper?",
+                        "",
                         [
                             SecondaryDecisionUponGoodOK.GOOD_FIT,
                             SecondaryDecisionUponGoodOK.OK_FIT,
@@ -272,8 +299,21 @@ def main() -> None:
                         index=None,
                     )
                 elif decision_p == PrimaryDecision.BAD_FIT:
+                    st.markdown(
+                        f"""
+                    <h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0px; padding-bottom: 0px;'>
+                    Should {current_cat} still be a secondary on this paper?
+                    </h3>
+                    <style>
+                    div[data-testid="stRadio"] > div {{
+                        margin-top: -20px;
+                    }}
+                    </style>
+                    """,
+                        unsafe_allow_html=True,
+                    )
                     decision_s = st.radio(
-                        f"Should {current_cat} still be a secondary on this paper?",
+                        "",
                         [
                             SecondaryDecisionUponBad.GREAT_FIT,
                             SecondaryDecisionUponBad.OK_FIT,

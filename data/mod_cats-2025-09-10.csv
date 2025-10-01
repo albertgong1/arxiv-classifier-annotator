@@ -1,0 +1,231 @@
+First name,Last name,Archive,Category,Role
+Jim,Cline,physics,astro-ph.CO: Cosmology and Nongalactic Astrophysics,moderator
+Gonzalo,Alonso-Álvarez,physics,astro-ph.CO: Cosmology and Nongalactic Astrophysics,moderator
+Dimitri,Veras,physics,astro-ph.EP: Earth and Planetary Astrophysics,moderator
+Andrew,Benson,physics,astro-ph.GA: Astrophysics of Galaxies,moderator
+Shin'ichiro,Ando,physics,astro-ph.HE: High Energy Astrophysical Phenomena,moderator
+Igor,Chilingarian,physics,astro-ph.IM: Instrumentation and Methods for Astrophysics,moderator
+Peter,Williams,physics,astro-ph.IM: Instrumentation and Methods for Astrophysics,moderator
+Scott,Kenyon,physics,astro-ph.SR: Solar and Stellar Astrophysics,moderator
+David,Grier,physics,cond-mat.dis-nn: Disordered Systems and Neural Networks,moderator
+David,Grier,physics,cond-mat.soft: Soft Condensed Matter,moderator
+Anna Nickolaevna,Morozovska,physics,cond-mat.mtrl-sci: Materials Science,moderator
+Matthew,Davis,physics,cond-mat.quant-gas: Quantum Gases,moderator
+Michael,Lawler,physics,cond-mat.str-el: Strongly Correlated Electrons,moderator
+Michael,Lawler,physics,cond-mat.supr-con: Superconductivity,moderator
+Victor,Galitski,physics,cond-mat.supr-con: Superconductivity,moderator
+Julien,Corman,cs,cs.AI: Artificial Intelligence,moderator
+Cassio,De Campos,cs,cs.AI: Artificial Intelligence,moderator
+Reuth,Mirsky,cs,cs.AI: Artificial Intelligence,moderator
+Timothy,Mann,cs,cs.AI: Artificial Intelligence,moderator
+Shiwali,Mohan,cs,cs.AI: Artificial Intelligence,moderator
+Vasco,Manquinho,cs,cs.AI: Artificial Intelligence,moderator
+Davide,Ciucci,cs,cs.AI: Artificial Intelligence,moderator
+Onur,Mutlu,cs,cs.AR: Hardware Architecture,moderator
+Christopher,Umans,cs,cs.CC: Computational Complexity,moderator
+Vasileios,Kalantzis,cs,"cs.CE: Computational Engineering, Finance, and Science",moderator
+Vasileios,Kalantzis,cs,cs.MS: Mathematical Software,moderator
+Sivaram,Ambikasaran,cs,"cs.CE: Computational Engineering, Finance, and Science",moderator
+Sivaram,Ambikasaran,cs,cs.MS: Mathematical Software,moderator
+Kevin,Buchin,cs,cs.CG: Computational Geometry,moderator
+Yoon,Kim,cs,cs.CL: Computation and Language,moderator
+Yonatan,Belinkov,cs,cs.CL: Computation and Language,moderator
+Wittawat,Jitkrittum,cs,cs.CL: Computation and Language,moderator
+Aditya,Joshi,cs,cs.CL: Computation and Language,moderator
+Leshem,Choshen,cs,cs.CL: Computation and Language,moderator
+Berkay,Celik,cs,cs.CR: Cryptography and Security,moderator
+Tal,Hassner,cs,cs.CV: Computer Vision and Pattern Recognition,moderator
+Humphrey,Shi,cs,cs.CV: Computer Vision and Pattern Recognition,moderator
+Christopher,Funk,cs,cs.CV: Computer Vision and Pattern Recognition,moderator
+Scott,Krig,cs,cs.CV: Computer Vision and Pattern Recognition,moderator
+Hossein,Azizpour,cs,cs.CV: Computer Vision and Pattern Recognition,moderator
+Chang,Xu,cs,cs.CV: Computer Vision and Pattern Recognition,moderator
+Thiago,Santos,cs,cs.CV: Computer Vision and Pattern Recognition,moderator
+Xinggang,Wang,cs,cs.CV: Computer Vision and Pattern Recognition,moderator
+Evan,Shelhamer,cs,cs.CV: Computer Vision and Pattern Recognition,moderator
+Terrance (Terry),Boult,cs,cs.CV: Computer Vision and Pattern Recognition,moderator
+Aylin,Caliskan,cs,cs.CY: Computers and Society,moderator
+Haiyi,Zhu,cs,cs.CY: Computers and Society,moderator
+Sanmay,Das,cs,cs.CY: Computers and Society,moderator
+H. V.,Jagadish,cs,cs.DB: Databases,moderator
+Elad,Schiller,cs,"cs.DC: Distributed, Parallel, and Cluster Computing",moderator
+Yuval,Emek,cs,"cs.DC: Distributed, Parallel, and Cluster Computing",moderator
+Ioannis,Chatzigiannakis,cs,"cs.DC: Distributed, Parallel, and Cluster Computing",moderator
+Michael,Lesk,cs,cs.DL: Digital Libraries,moderator
+Lillian,Cassel,cs,cs.DL: Digital Libraries,moderator
+Marcin,Pilipczuk,cs,cs.DM: Discrete Mathematics,moderator
+David,Eppstein,cs,cs.DS: Data Structures and Algorithms,moderator
+Igor,Markov,cs,cs.ET: Emerging Technologies,moderator
+Michael,Domaratzki,cs,cs.FL: Formal Languages and Automata Theory,moderator
+Joe,Halpern,cs,cs.GL: General Literature,moderator
+Joe,Halpern,cs,cs.OH: Other,moderator
+Stephen,Spencer,cs,cs.GR: Graphics,moderator
+Richard,Cole,cs,cs.GT: Computer Science and Game Theory,moderator
+Aviad,Rubinstein,cs,cs.GT: Computer Science and Game Theory,moderator
+Jeremy,Foote,cs,cs.HC: Human-Computer Interaction,moderator
+James,Allan,cs,cs.IR: Information Retrieval,moderator
+Emina,Soljanin,cs,cs.IT: Information Theory,moderator
+Thomas,Dietterich,cs,cs.LG: Machine Learning,moderator/section chair
+Cheng Soon,Ong,cs,cs.LG: Machine Learning,moderator
+Christopher,Meek,cs,cs.LG: Machine Learning,moderator
+Sriraam,Natarajan,cs,cs.LG: Machine Learning,moderator
+Igor,Colin,cs,cs.LG: Machine Learning,moderator
+Diana,Benavides-Prado,cs,cs.LG: Machine Learning,moderator
+Patricia,Riddle,cs,cs.LG: Machine Learning,moderator
+Liping,Liu,cs,cs.LG: Machine Learning,moderator
+Gopalan,Nadathur,cs,cs.LO: Logic in Computer Science,moderator
+Gopalan,Nadathur,cs,cs.PL: Programming Languages,moderator
+Jose,Vidal,cs,cs.MA: Multiagent Systems,moderator
+Ana,Bazzan,cs,cs.MA: Multiagent Systems,moderator
+Ichiro,Ide,cs,cs.MM: Multimedia,moderator
+Paolo,Bientinesi,cs,cs.MS: Mathematical Software,moderator
+Lashon,Booker,cs,cs.NE: Neural and Evolutionary Computing,moderator
+Marco,Canini,cs,cs.NI: Networking and Internet Architecture,moderator
+William,Waite,cs,cs.OS: Operating Systems,moderator
+Leana,Golubchik,cs,cs.PF: Performance,moderator
+Chablat,Damien,cs,cs.RO: Robotics,moderator
+Hasan,Poonawala,cs,cs.RO: Robotics,moderator
+Andriy,Sarabakha,cs,cs.RO: Robotics,moderator
+Anqing,Duan,cs,cs.RO: Robotics,moderator
+Richard,Zippel,cs,cs.SC: Symbolic Computation,moderator
+Michael,O'Donnell,cs,cs.SD: Sound,moderator
+Björn,Schuller,cs,cs.SD: Sound,moderator
+Florian,Pokorny,cs,cs.SD: Sound,moderator
+Nicolas,Anquetil,cs,cs.SE: Software Engineering,moderator
+David,Gleich,cs,cs.SI: Social and Information Networks,moderator
+Xu,Cheng,econ,econ.EM: Econometrics,moderator
+Alexandre,Poirier,econ,econ.EM: Econometrics,moderator
+Zi Yang,Kang,econ,econ.GN: General Economics,moderator
+Jean-Michel,Benkert,econ,econ.GN: General Economics,moderator
+Elliot,Lipnowski,econ,econ.TH: Theoretical Economics,moderator
+Mallesh,Pai,econ,econ.TH: Theoretical Economics,moderator
+Sharon,Gannot,eess,eess.AS: Audio and Speech Processing,moderator
+Zbyněk,Koldovský,eess,eess.AS: Audio and Speech Processing,moderator
+Symeon,Delikaris Manias,eess,eess.AS: Audio and Speech Processing,moderator
+Yohei,Kawaguchi,eess,eess.AS: Audio and Speech Processing,moderator
+Gongping,Huang,eess,eess.AS: Audio and Speech Processing,moderator
+Antonio,Ortega,eess,eess.IV: Image and Video Processing,moderator
+James,Fowler,eess,eess.IV: Image and Video Processing,moderator
+Fulvio,Gini,eess,eess.SP: Signal Processing,moderator
+Luis,Duffaut Espinosa,eess,eess.SY: Systems and Control,moderator
+Luis,Duffaut Espinosa,eess,cs.SY: Systems and Control,moderator
+Luis,Duffaut Espinosa,eess,math.OC: Optimization and Control,moderator
+Matt,Visser,physics,gr-qc: General Relativity and Quantum Cosmology,moderator
+Sumati,Surya,physics,gr-qc: General Relativity and Quantum Cosmology,moderator
+John,Conway,physics,hep-ex: High Energy Physics - Experiment,moderator
+Tanmoy,Bhattacharya,physics,hep-lat: High Energy Physics - Lattice,moderator
+Robert,Edwards,physics,hep-lat: High Energy Physics - Lattice,moderator
+Jorge,Portoles,physics,hep-ph: High Energy Physics - Phenomenology,moderator
+Csaba,Csaki,physics,hep-ph: High Energy Physics - Phenomenology,moderator
+Kaustubh,Agashe,physics,hep-ph: High Energy Physics - Phenomenology,moderator
+Jacques,Distler,physics,hep-th: High Energy Physics - Theory,moderator
+Kenneth,Intriligator,physics,hep-th: High Energy Physics - Theory,moderator
+Marcello,Porta,physics,math-ph: Mathematical Physics,moderator
+Marcello,Porta,physics,math.MP: Mathematical Physics,moderator
+Paul,Fendley,physics,math-ph: Mathematical Physics,moderator
+Paul,Fendley,physics,math.MP: Mathematical Physics,moderator
+Paul,Fendley,physics,nlin.SI: Exactly Solvable and Integrable Systems,moderator
+Irena,Swanson,math,math.AC: Commutative Algebra,moderator
+Irena,Swanson,math,math.AG: Algebraic Geometry,moderator
+Angela,Gibney,math,math.AG: Algebraic Geometry,moderator
+Christopher,Sogge,math,math.AP: Analysis of PDEs,moderator
+Herbert,Koch,math,math.AP: Analysis of PDEs,moderator
+Jim,Fowler,math,math.AT: Algebraic Topology,moderator
+Jim,Fowler,math,math.KT: Theory and Homology,moderator
+Stefan,Steinerberger,math,math.CA: Classical Analysis and ODEs,moderator
+Victor,Reiner,math,math.CO: Combinatorics,moderator
+Jozsef,Balogh,math,math.CO: Combinatorics,moderator
+Jiří,Lebl,math,math.CV: Complex Variables,moderator
+Rafe,Mazzeo,math,math.DG: Differential Geometry,moderator
+Gilles,Carron,math,math.DG: Differential Geometry,moderator
+Anton,Gorodetski,math,math.DS: Dynamical Systems,moderator
+Krystyna,Kuperberg,math,math.GN: General Topology,moderator
+Robert,Guralnick,math,math.GR: Group Theory,moderator
+Nikolay,Nikolov,math,math.GR: Group Theory,moderator
+Saul,Schleimer,math,math.GT: Geometric Topolog,moderator
+Andrew,Zucker,math,math.LO: Logic,moderator
+Grigorios,Paouris,math,math.MG: Metric Geometry,moderator
+Nilima,Nigam,math,math.NA: Numerical Analysis,moderator
+Nilima,Nigam,math,cs.NA: Numerical Analysis,moderator
+Paul,Gunnells,math,math.NT: Number Theory,moderator/section chair
+William,McCallum,math,math.NT: Number Theory,moderator
+Marc,Rieffel,math,math.OA: Operator Algebras,moderator
+Marc,Rieffel,math,math.FA: Functional Analysis,moderator
+Mikhail,Ostrovskii,math,math.OA: Operator Algebras,moderator
+Mikhail,Ostrovskii,math,math.FA: Functional Analysis,moderator
+Jason,Swanson,math,math.PR: Probability,moderator
+Marton,Balazs,math,math.PR: Probability,moderator
+Gordana,Todorov,math,math.RA: Rings and Algebras,moderator
+Bill,Casselman,math,math.RT: Representation Theory,moderator
+Anthony,Licata,math,math.RT: Representation Theory,moderator
+Martin,Wells,math,math.ST: Statistics Theory,moderator
+Martin,Wells,math,stat.TH: Statistics Theory,moderator
+Raja,Paul,physics,nlin.AO: Adaptation and Self-Organizing Systems,moderator
+Andreas,Schadschneider,physics,nlin.CG: Cellular Automata and Lattice Gases,moderator
+Panayotis,Kevrekidis,physics,nlin.PS: Pattern Formation and Solitons,moderator
+Jarmo,Hietarinta,physics,nlin.SI: Exactly Solvable and Integrable Systems,moderator
+Marcello,Pavan,physics,nucl-ex: Nuclear Experiment,moderator
+Robert,Janssens,physics,nucl-ex: Nuclear Experiment,moderator
+Ang,Li,physics,nucl-th: Nuclear Theory,moderator
+Robert,Ryne,physics,physics.acc-ph: Accelerator Physics,moderator
+John,Wettlaufer,physics,physics.ao-ph: Atmospheric and Oceanic Physics,moderator
+Niels,Gronbech-Jensen,physics,physics.app-ph: Applied Physics,moderator
+Thomas,Moeller,physics,physics.atm-clus: Atomic and Molecular Clusters,moderator
+Yuri,Ralchenko,physics,physics.atom-ph: Atomic Physics,moderator
+Don,Lamb,physics,physics.bio-ph: Biological Physics,moderator
+Michele,Ceriotti,physics,physics.chem-ph: Chemical Physics,moderator
+David,Limmer,physics,physics.chem-ph: Chemical Physics,moderator
+Mariana,Rossi,physics,physics.chem-ph: Chemical Physics,moderator
+Michael,Stone,physics,physics.class-ph: Classical Physics,moderator
+Michael,Stone,physics,cond-mat.stat-mech: Statistical Mechanics,moderator
+Michael,Stone,physics,cond-mat.other: Other Condensed Matter,moderator
+Michael,Stone,physics,cond-mat.mes-hall: Mesoscale and Nanoscale Physics,moderator
+Axel,Naumann,physics,"physics.data-an: Data Analysis, Statistics and Probability",moderator
+Susan,Ramlo,physics,physics.ed-ph: Physics Education,moderator
+Yiyang,Sun,physics,physics.flu-dyn: Fluid Dynamics,moderator
+Patrick,Boyle,physics,physics.gen-ph: General Physics,moderator
+Ronald,Cohen,physics,physics.geo-ph: Geophysics,moderator
+Michel,Janssen,physics,physics.hist-ph: History and Philosophy of Physics,moderator
+Hella,Snoek,physics,physics.ins-det: Instrumentation and Detectors,moderator
+Xun,Jia,physics,physics.med-ph: Medical Physics,moderator
+Jonathan,Squire,physics,physics.plasm-ph: Plasma Physics,moderator
+Imre,Bartos,physics,physics.pop-ph: Popular Physics,moderator
+Paolo,Grigolini,physics,physics.soc-ph: Physics and Society,moderator
+Peter,Gallagher,physics,physics.space-ph: Space Physics,moderator
+Adriano,Barra,q-bio,q-bio.CB: Cell Behavior,moderator
+Ralf,Bundschuh,q-bio,q-bio.GN: Genomics,moderator/section chair
+Ralf,Bundschuh,q-bio,q-bio.QM: Quantitative Methods,moderator/section chair
+Ralf,Bundschuh,q-bio,q-bio.OT: Other Quantitative Biology,moderator/section chair
+Andrew,Mugler,q-bio,q-bio.MN: Molecular Networks,moderator
+Carson,Chow,q-bio,q-bio.NC: Neurons and Cognition,moderator
+Carson,Chow,q-bio,q-bio.TO: Tissues and Organs,moderator
+Luca,Peliti,q-bio,q-bio.PE: Populations and Evolution,moderator
+Richard,Neher,q-bio,q-bio.PE: Populations and Evolution,moderator
+Ned,Wingreen,q-bio,q-bio.SC: Subcellular Processes,moderator
+Arthur,Berd,q-fin,q-fin: Quantitative Finance,moderator/section chair
+Arthur,Berd,q-fin,q-fin.GN: General Finance,moderator/section chair
+Arthur,Berd,q-fin,q-fin.PM: Portfolio Management,moderator/section chair
+Peter,Forsyth,q-fin,q-fin.CP: Computational Finance,moderator
+Rama,Cont,q-fin,q-fin.CP: Computational Finance,moderator
+Rama,Cont,q-fin,q-fin.PR: Pricing of Securities,moderator
+Marcel,Nutz,q-fin,q-fin.MF: Mathematical Finance,moderator
+Lisa,Goldberg,q-fin,q-fin.PM: Portfolio Management,moderator
+Barry,Schachter,q-fin,q-fin.RM: Risk Management,moderator
+Lisa,Borland,q-fin,q-fin.ST: Statistical Finance,moderator
+Christian,Silva,q-fin,q-fin.ST: Statistical Finance,moderator
+Gilles,Zumbach,q-fin,q-fin.ST: Statistical Finance,moderator
+Dmitry,Rakhlin,q-fin,q-fin.TR: Trading and Market Microstructure,moderator
+Jean-Philippe,Bouchaud,q-fin,q-fin.TR: Trading and Market Microstructure,moderator/section chair
+Jean-Philippe,Bouchaud,q-fin,q-fin.GN: General Finance,moderator/section chair
+Lev,Vaidman,physics,quant-ph: Quantum Physics,moderator
+Daniel,Gottesman,physics,quant-ph: Quantum Physics,moderator
+Leo,Lahti,stat,stat.AP: Applications,moderator
+Elena,Erosheva,stat,stat.AP: Applications,moderator
+Shane,Jensen,stat,stat.ME: Methodology,moderator
+Elizabeth,Ogburn,stat,stat.ME: Methodology,moderator
+Zoltan,Szabo,stat,stat.ML: Machine Learning,moderator
+Pierre,Alquier,stat,stat.ML: Machine Learning,moderator
+Larry,Wasserman,stat,stat.OT: Other Statistics,moderator/section chair
+Larry,Wasserman,stat,stat.TH: Statistics Theory,moderator/section chair
+Larry,Wasserman,stat,math.ST: Statistics Theory,moderator/section chair
+Larry,Wasserman,stat,stat.CO: Computation,moderator/section chair
